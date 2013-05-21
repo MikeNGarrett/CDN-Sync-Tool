@@ -29,9 +29,9 @@ class Cst {
 
 
 	}
-//test
 	public function wp_handle_upload( $data, $type ) {
-	    if ( $data['type'] == 'application/pdf' ) {
+		$check_type = explode('/', $data['type']);
+	    if ( $check_type[0] != 'image' ) {
 	        $this->_file = $data['file'];
 	    } 
 	    return $data;
@@ -153,9 +153,11 @@ class Cst {
 		} else if ($this->connectionType == 'Cloudfiles') {
 			require CST_DIR.'etc/mime.php';
 			$object = $this->cdnConnection->create_object($remotePath);
+			if (!$object) echo 'Debug: no object was created via cdnConnection create_object method.';
 			$extension = pathinfo($file, PATHINFO_EXTENSION);
 			$object->content_type = $mime_types[$extension];
 			$result = $object->load_from_filename($file);
+			if (!$object) echo 'Debug: no object, but still made it to end of pushFile method.';
 		} else if ($this->connectionType == 'WebDAV') {
 			// Ensure directory exists, create it otherwise
 			$remotePathExploded = explode('/', $remotePath);
