@@ -29,7 +29,7 @@ class Cst {
 
 
 	}
-
+//test
 	public function wp_handle_upload( $data, $type ) {
 	    if ( $data['type'] == 'application/pdf' ) {
 	        $this->_file = $data['file'];
