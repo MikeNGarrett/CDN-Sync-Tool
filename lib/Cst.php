@@ -22,8 +22,19 @@ class Cst {
 		// Enqueue files
 		add_action('admin_init', array($this, 'enqueueFiles'));
 
+		add_action( 'wp_handle_upload', array( $this, 'wp_handle_upload' ), 20, 2 );
+
 		// Add action for image uploads
 		add_action('wp_generate_attachment_metadata', array($this, 'uploadMedia'));
+
+
+	}
+
+	public function wp_handle_upload( $data, $type ) {
+	    if ( $data['type'] == 'application/pdf' ) {
+	        $this->_file = $data['file'];
+	    } 
+	    return $data;
 	}
 
 	/**
@@ -461,9 +472,16 @@ class Cst {
 
 	public function uploadMedia($meta) {
 		self::createConnection();
-		$uploaddir = wp_upload_dir(); 
-		$uploaddir = $uploaddir['basedir'].'/';
-		self::pushFile($uploaddir.$meta['file'], str_replace(ABSPATH, '', $uploaddir).$meta['file']);
+		if(count($meta) < 1 && !isset($meta['file'])) {
+			$filepath = $this->_file;
+			$name = str_replace(ABSPATH, '', $filepath);
+		} else {
+			$uploaddir = wp_upload_dir(); 
+			$uploaddir = $uploaddir['basedir'].'/';
+			$name = str_replace(ABSPATH, '', $uploaddir).$meta['file'];
+			$filepath = $uploaddir.$meta['file'];
+		}
+		self::pushFile($filepath, $name);
 		if (isset($meta['sizes']) && is_array($meta['sizes']) && !empty($meta['sizes'])) {
 			foreach($meta['sizes'] as $size) {
 				$dirname = dirname($meta['file']).'/';
