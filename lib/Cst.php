@@ -152,11 +152,18 @@ class Cst {
 			}
 		} else if ($this->connectionType == 'Cloudfiles') {
 			require CST_DIR.'etc/mime.php';
+
 			$object = $this->cdnConnection->create_object($remotePath);
+
 			if (!$object) echo 'Debug: no object was created via cdnConnection create_object method.';
 			$extension = pathinfo($file, PATHINFO_EXTENSION);
 			$object->content_type = $mime_types[$extension];
-			$result = $object->load_from_filename($file);
+			try {
+				$result = $object->load_from_filename($file);
+			} catch (Exception $e) {
+				echo 'Load from Filename error: ' . $e->getMessage();
+			}
+
 			if (!$object) echo 'Debug: no object, but still made it to end of pushFile method.';
 		} else if ($this->connectionType == 'WebDAV') {
 			// Ensure directory exists, create it otherwise
@@ -378,6 +385,7 @@ class Cst {
 			echo '<h2>Syncing Files..</h2>';
 			echo '<div class="cst-progress" style="height: 500px; overflow: auto;">';
 			foreach($filesToSync as $file) {
+				echo 'Beginning pushFile call ['.$i.'/'.$total.'] '.$file['remote_path'].'<br />';
 				$this->pushFile($file['file_dir'], $file['remote_path']);
 				$padstr = str_pad("", 512, " ");
 				echo $padstr;
