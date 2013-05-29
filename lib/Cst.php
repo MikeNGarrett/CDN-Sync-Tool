@@ -359,6 +359,34 @@ class Cst {
 	}
 
 	/**
+	 * Gets all required files
+	 * 
+	 */
+	public function getQueue() {
+		global $wpdb;
+
+		$this->createConnection();
+
+		if (isset(CST_Page::$messages) && !empty(CST_Page::$messages)) {
+			// foreach (CST_Page::$messages as $message) {
+			// 	echo $message;
+			// }
+			exit;
+		}
+
+		if ($this->connectionType == 'Origin') {
+			// error
+			exit;
+		} else {
+			$this->findFiles();
+			
+			$filesToSync = $wpdb->get_results("SELECT * FROM `".CST_TABLE_FILES."` WHERE `synced` = '0'", ARRAY_A);
+
+			return $filesToSync;
+		}
+	}
+
+	/**
 	 * Syncs all required files to CDN
 	 * 
 	 */

@@ -98,9 +98,8 @@ function cst_get_queue() {
 		die();
 	}
 	// check_ajax_referer( 'cst_check_string', 'cst_check' );
-	// $queue = $GLOBALS['core']->getQueue();
-	// echo json_encode($queue);
-	echo json_encode('JSON-encoded queue');
+	$queue = $GLOBALS['core']->getQueue();
+	echo json_encode($queue);
 	die();
 }
 
