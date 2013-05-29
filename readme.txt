@@ -1,8 +1,8 @@
 === CDN Sync Tool ===
-Contributors: olliea95,Fubra,Backie,ray.viljoen
+Contributors: olliea95,Fubra,Backie,ray.viljoen,MikeNGarrett,nelsonmc
 Tags: CDN,content delivery network, sync, CDN sync, tool, Content, Upload, Files, Media, Optimization,cloudfront,cloud front,amazon s3,s3,cloudfiles,theme,MaxCDN,Origin Pull,Origin,Pull,files,speed,faster,accelerator,Page Load, zoom, webdav, web, dav
-Tested up to: 3.1
-Stable tag: 2.2.1
+Tested up to: 3.4
+Stable tag: 2.3
 Requires At Least: 3.0
 Donate Link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=99WUGVV4HY5ZE&lc=GB&item_name=CATN%20Plugins-CDN&item_number=catn-cdn&currency_code=GBP&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted 
 
@@ -105,6 +105,12 @@ The difference is that with Origin Pull the files are pulled from your web host 
 3. Go CDN Sync Tool and configure
 
 == CHANGELOG ==
+
+= 2.3 = 
+
+* Fixed upload support for files other than images, eg PDFs, videos, doc files, etc.
+* Corrected debugging for sync function. Now when files are missing in the file structure, but not the database you'll get an error and the sync will continue.
+* [in progress] Switch syncing to run with AJAX to give better feedback, not timeout. 
 
 = 2.2.1 =
 
