@@ -38,7 +38,7 @@ class Cst_Site {
 
 	public function combineFiles($buffer, $filetype) {
 		require_once CST_DIR.'lib/Cst.php';
-		$core = new Cst;
+		$core = new Cst();
 
 		$stylesheetCombined = '';
 		$stylesheets = array();
