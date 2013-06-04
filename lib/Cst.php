@@ -402,6 +402,18 @@ class Cst {
 	}
 
 	/**
+	 * Syncs an individual file to CDN
+	 * 
+	 */
+	public function syncIndividualFile($file) {
+
+		global $wpdb;
+		$this->createConnection();
+		$this->pushFile($file['file_dir'], $file['remote_path']);
+
+	}
+
+	/**
 	 * Sync a specified directory to the CDN
 	 * 
 	 * @param $dirs array of directories to sync relative to site root

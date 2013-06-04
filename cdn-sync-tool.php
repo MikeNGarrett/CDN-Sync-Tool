@@ -104,11 +104,12 @@ function cst_get_queue() {
 
 add_action('wp_ajax_cst_sync_file', 'cst_sync_file');
 
-function cst_sync_file() {
+function cst_sync_file($file) {
 	if ( !current_user_can( 'manage_options' ) ) {
 		die();
 	}
 	check_ajax_referer( 'cst_check_string', 'cst_check' );
+	$GLOBALS['core']->syncIndividualFile($file);
 	echo json_encode('Successfully synced a file');
 	die();
 }
