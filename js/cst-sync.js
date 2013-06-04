@@ -27,10 +27,10 @@ jQuery(document).ready(function($) {
 					return;
 				// }
 				// doSyncFile();
-			}, "json");
+			});
 		};
 
 		doSyncFile();
-	}, "json");
+	});
 
 });

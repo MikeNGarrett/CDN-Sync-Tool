@@ -97,6 +97,7 @@ function cst_get_queue() {
 		die();
 	}
 	check_ajax_referer( 'cst_check_string', 'cst_check' );
+	ob_clean(); // clear buffer
 	$queue = $GLOBALS['core']->getQueue();
 	echo json_encode($queue);
 	die();
@@ -109,7 +110,8 @@ function cst_sync_file($file) {
 		die();
 	}
 	check_ajax_referer( 'cst_check_string', 'cst_check' );
-	$GLOBALS['core']->syncIndividualFile($file);
+	ob_clean(); // clear buffer
+	// $GLOBALS['core']->syncIndividualFile($file);
 	echo json_encode('Successfully synced a file');
 	die();
 }
