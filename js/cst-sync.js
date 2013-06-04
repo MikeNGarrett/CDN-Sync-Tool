@@ -5,32 +5,43 @@ jQuery(document).ready(function($) {
 		cst_check: syncAjax.cst_check
 	};
 	// We can also pass the url value separately from ajaxurl for front end AJAX implementations
-	$.post(syncAjax.ajax_url, data, function(response) {
-		alert('Response from server: ' + response);
+	$.ajax({
+		type: "post",
+		url: syncAjax.ajax_url,
+		data: data,
+		success: function(response) {
+			var queue = response;
+			alert("Number of items: " + queue.length);
+			// for (var x = 0; x < response.length; x++) {
+			for (var x = 0; x < 3; x++) {
+				alert("The ID for index " + x + " is: " + queue[x].id);
+			}
+			//alert(response.length);
+			// alert('Before entering the variable doSyncFile, the value of i is: ' + i);
 
-		var response = $.parseJSON(response);
+			// var doSyncFile = function() {
+			// 	var syncFileData = {
+			// 		action: 'cst_sync_file',
+			// 		cst_check: syncAjax.cst_check
+			// 	};
+			// 	$.post({
+			// 		url: syncAjax.ajax_url,
+			// 		data: syncFileData,
+			// 		success: function(response) {
+			// 			i++;
+			// 			alert('The value of i is: ' + i);
+			// 			//if (i > 3) {
+			// 				return;
+			// 			// }
+			// 			// doSyncFile();
+			// 		},
+			// 		dataType: 'json'
+			// 	});
+			// };
 
-		var numFiles = response.length;
-		alert('Length of response: ' + numFiles);
-		var i = 1;
-		alert('Before entering the variable doSyncFile, the value of i is: ' + i);
-
-		var doSyncFile = function() {
-			var syncFileData = {
-				action: 'cst_sync_file',
-				cst_check: syncAjax.cst_check
-			};
-			$.post(syncAjax.ajax_url, syncFileData, function(response) {
-				i++;
-				alert('The value of i is: ' + i);
-				//if (i > 3) {
-					return;
-				// }
-				// doSyncFile();
-			});
-		};
-
-		doSyncFile();
+			// doSyncFile();
+		},
+		dataType: 'json'
 	});
 
 });
