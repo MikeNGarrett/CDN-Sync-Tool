@@ -391,48 +391,14 @@ class Cst {
 	 * 
 	 */
 	public function syncFiles() {
-		global $wpdb;
 
-		$this->createConnection();
+		$cst_check = wp_create_nonce("cst_check_string");
 
-		if (isset(CST_Page::$messages) && !empty(CST_Page::$messages)) {
-			foreach (CST_Page::$messages as $message) {
-				echo $message;
-			}
-			exit;
-		}
-		
-		if ($this->connectionType == 'Origin') {
-			echo '<div class="cst-progress">Sync not required on origin pull CDNs.';
-		} else {
-			$this->findFiles();
-			
-			$filesToSync = $wpdb->get_results("SELECT * FROM `".CST_TABLE_FILES."` WHERE `synced` = '0'", ARRAY_A);
-			$total = count($filesToSync);
-			$i = 1;
-			echo '<h2>Syncing Files..</h2>';
-			echo '<div class="cst-progress" style="height: 500px; overflow: auto;">';
-			foreach($filesToSync as $file) {
-				echo 'Beginning pushFile call ['.$i.'/'.$total.'] '.$file['remote_path'].'<br />';
-				$this->pushFile($file['file_dir'], $file['remote_path']);
-				$padstr = str_pad("", 512, " ");
-				echo $padstr;
-				echo 'Syncing ['.$i.'/'.$total.'] '.$file['remote_path'].'<br />';
-				flush();
-				$i++;
-				$wpdb->update(
-					CST_TABLE_FILES,
-					array(
-						'synced' => '1'
-					),
-					array(
-						'id' => $file['id']
-					)
-				);
-			}
-			echo 'All files synced.';
-		}
-		echo '</div><br /><br />Return to <a href="'.CST_URL.'?page=cst">CST Options</a>.';
+		wp_enqueue_script('cst-sync-js', plugins_url('/js/cst-sync.js', CST_FILE));
+		wp_localize_script( 'cst-sync-js', 'syncAjax', array( 'ajax_url' => admin_url( 'admin-ajax.php' ), 'cst_check' => $cst_check) );
+
+		echo 'Enqueueing to directory: ' . CST_DIR . 'js/cst-sync.js';
+
 	}
 
 	/**

@@ -90,14 +90,13 @@ function superCacheError() {
 	echo '<div class="error"><p>CDN Sync Tool requires <a href="http://wordpress.org/extend/plugins/wp-super-cache/" target="_blank">WP Super Cache</a>.</p></div>';
 }
 
-// $cst_check = wp_create_nonce("cst_check_string");
 add_action('wp_ajax_cst_get_queue', 'cst_get_queue');
 
 function cst_get_queue() {
 	if ( !current_user_can( 'manage_options' ) ) {
 		die();
 	}
-	// check_ajax_referer( 'cst_check_string', 'cst_check' );
+	check_ajax_referer( 'cst_check_string', 'cst_check' );
 	$queue = $GLOBALS['core']->getQueue();
 	echo json_encode($queue);
 	die();
