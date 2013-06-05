@@ -37,13 +37,14 @@ function sync() {
 			date.setTime(date.getTime()+(10*24*60*60*1000));
 			var expires = date.toGMTString();
 			var jsonString = JSON.stringify(queue);
-			document.cookie = 'cst_queue='+jsonString+'; expires='+expires+'; path=/';
+			console.log(jsonString);
+			document.cookie = 'cstQueue='+jsonString+'; expires='+expires+'; path=/';
 			console.log("Number of items: " + queue.length);
 
 			if (queue.length > 0) {
 			//				for (var x = 0; x < queue.length; x++) {
 				console.log(queue);
-				console.log(document.cookie.cst_queue);
+				console.log(document.cookie.cstQueue);
 				//sync(queue[queue.length - 1]);
 			//				}
 
