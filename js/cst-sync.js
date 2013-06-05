@@ -16,10 +16,11 @@ jQuery(document).ready(function($) {
 			if (queue.length > 0) {
 				for (var x = 0; x < queue.length; x++) {
 					alert("The ID for index " + x + " is: " + queue[x].id);
+					var passedFile = queue[x]; // eventually this will be populated by pulling element from cookie-based queue
 					var syncFileData = {
 						action: 'cst_sync_file',
 						cst_check: syncAjax.cst_check,
-						file: queue[x]
+						file: passedFile
 					};
 					$.ajax({
 						type: "post",
