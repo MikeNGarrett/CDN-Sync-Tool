@@ -368,19 +368,19 @@ class Cst {
 		$this->createConnection();
 
 		if (isset(CST_Page::$messages) && !empty(CST_Page::$messages)) {
-			// foreach (CST_Page::$messages as $message) {
-			// 	echo $message;
-			// }
+			foreach (CST_Page::$messages as $message) {
+				echo $message;
+			}
 			exit;
 		}
 
 		if ($this->connectionType == 'Origin') {
-			// error
-			exit;
+			echo 'Sync not required on origin pull CDNs.<br />';
+			return false;
 		} else {
 			$this->findFiles();
 			
-			$filesToSync = $wpdb->get_results("SELECT * FROM `".CST_TABLE_FILES."`", ARRAY_A);
+			$filesToSync = $wpdb->get_results("SELECT * FROM `".CST_TABLE_FILES."` WHERE `synced` = '0'", ARRAY_A);
 
 			return $filesToSync;
 		}
