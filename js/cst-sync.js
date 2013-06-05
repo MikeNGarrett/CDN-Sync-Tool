@@ -27,7 +27,7 @@ jQuery(document).ready(function($) {
 						url: syncAjax.ajax_url,
 						data: syncFileData,
 						success: function(response) {
-							$(".cst-progress").append(response.message);
+							$(".cst-progress").append(response);
 						}
 					});
 				}
