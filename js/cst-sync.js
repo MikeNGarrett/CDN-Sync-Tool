@@ -1,9 +1,5 @@
 jQuery(document).ready(function($) {
-
-	var data = {
-		action: 'cst_get_queue',
-		cst_check: syncAjax.cst_check
-	};
+var queueTotal;
 
 function sync() {
 	var queue = readCookie('cstQueue');
@@ -11,12 +7,13 @@ function sync() {
 	if(!queue || queue.length <= 0) {
 		return;
 	}
+	console.log(queueTotal);
 	var passedFile = queue.shift(); // eventually this will be populated by pulling element from cookie-based queue
 	var syncFileData = {
 		action: 'cst_sync_file',
 		cst_check: syncAjax.cst_check,
 		file: passedFile,
-		total: queue.length
+		total: queueTotal
 	};
 	$.ajax({
 		type: "post",
@@ -29,21 +26,24 @@ function sync() {
 			var jsonString = JSON.stringify(queue);
 			document.cookie = 'cstQueue='+jsonString+'; expires='+expires+'; path=/';
 
-
 			$(".cst-progress").append(response);
 			sync();
 		}
 	});
 }
 
+
+	var data = {
+		action: 'cst_get_queue',
+		cst_check: syncAjax.cst_check
+	};
 	// We can also pass the url value separately from ajaxurl for front end AJAX implementations
 	$.ajax({
 		type: "post",
 		url: syncAjax.ajax_url,
 		data: data,
-		success: function(response) {
-			var queue = response.slice(0,5);
-
+		success: function(queue) {
+			queueTotal = queue.length;
 			if (queue.length > 0) {
 				var date = new Date();
 				date.setTime(date.getTime()+(10*24*60*60*1000));
@@ -52,6 +52,9 @@ function sync() {
 				document.cookie = 'cstQueue='+jsonString+'; expires='+expires+'; path=/';
 
 				sync();
+			} else { 
+				// either no files or error
+				$(".cst-progress").append(queue);
 			}
 
 			// Upon completion, show the Return to Options Page button
@@ -59,28 +62,6 @@ function sync() {
 				$(this).append('<strong>All files synced.</strong>');
 				$(".cst-progress-return").show();
 			});
-			
-			// var doSyncFile = function() {
-			// 	var syncFileData = {
-			// 		action: 'cst_sync_file',
-			// 		cst_check: syncAjax.cst_check
-			// 	};
-			// 	$.post({
-			// 		url: syncAjax.ajax_url,
-			// 		data: syncFileData,
-			// 		success: function(response) {
-			// 			i++;
-			// 			console.log('The value of i is: ' + i);
-			// 			//if (i > 3) {
-			// 				return;
-			// 			// }
-			// 			// doSyncFile();
-			// 		},
-			// 		dataType: 'json'
-			// 	});
-			// };
-
-			// doSyncFile();
 		},
 		dataType: 'json'
 	});
