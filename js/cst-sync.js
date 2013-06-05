@@ -3,12 +3,10 @@ var queueTotal;
 var queue;
 
 function sync() {
-//	var queue = readCookie('cstQueue');
-//	queue = JSON.parse(queue);
 	if(!queue || queue.length <= 0) {
 		return;
 	}
-	var passedFile = queue.shift(); // eventually this will be populated by pulling element from cookie-based queue
+	var passedFile = queue.shift(); 
 	var syncFileData = {
 		action: 'cst_sync_file',
 		cst_check: syncAjax.cst_check,
@@ -20,14 +18,6 @@ function sync() {
 		url: syncAjax.ajax_url,
 		data: syncFileData,
 		success: function(response) {
-/*
-			var date = new Date();
-			date.setTime(date.getTime()+(10*24*60*60*1000));
-			var expires = date.toGMTString();
-			var jsonString = JSON.stringify(queue);
-			document.cookie = 'cstQueue='+jsonString+'; expires='+expires+'; path=/';
-*/
-
 			$(".cst-progress").prepend(response);
 			sync();
 		}
@@ -48,13 +38,6 @@ function sync() {
 			queueTotal = q.length;
 			if (q.length > 0) {
 				queue = q;
-/*
-				var date = new Date();
-				date.setTime(date.getTime()+(10*24*60*60*1000));
-				var expires = date.toGMTString();
-				var jsonString = JSON.stringify(queue);
-				document.cookie = 'cstQueue='+jsonString+'; expires='+expires+'; path=/';
-*/
 				sync();
 			} else { 
 				// either no files or error
@@ -71,13 +54,3 @@ function sync() {
 	});
 
 });
-function readCookie(name) {
-	var nameEQ = name + "=";
-	var ca = document.cookie.split(';');
-	for(var i=0;i < ca.length;i++) {
-		var c = ca[i];
-		while (c.charAt(0)==' ') c = c.substring(1,c.length);
-		if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
-	}
-	return null;
-}
