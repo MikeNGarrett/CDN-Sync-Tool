@@ -10,25 +10,25 @@ jQuery(document).ready(function($) {
 		url: syncAjax.ajax_url,
 		data: data,
 		success: function(response) {
-			var queue = response;
+			var queue = response.slice(0,5);
 			alert("Number of items: " + queue.length);
-			// for (var x = 0; x < response.length; x++) {
-			for (var x = 0; x < 1; x++) {
-				alert("The ID for index " + x + " is: " + queue[x].id);
-				var syncFileData = {
-					action: 'cst_sync_file',
-					cst_check: syncAjax.cst_check,
-					item: queue[x]
-				};
-				$.ajax({
-					type: "post",
-					url: syncAjax.ajax_url,
-					data: syncFileData
-				});
-			}
-			//alert(response.length);
-			// alert('Before entering the variable doSyncFile, the value of i is: ' + i);
 
+			if (queue.length > 0) {
+				for (var x = 0; x < queue.length; x++) {
+					alert("The ID for index " + x + " is: " + queue[x].id);
+					var syncFileData = {
+						action: 'cst_sync_file',
+						cst_check: syncAjax.cst_check,
+						file: queue[x]
+					};
+					$.ajax({
+						type: "post",
+						url: syncAjax.ajax_url,
+						data: syncFileData
+					});
+				}
+			}
+			
 			// var doSyncFile = function() {
 			// 	var syncFileData = {
 			// 		action: 'cst_sync_file',

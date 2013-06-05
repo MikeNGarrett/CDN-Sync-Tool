@@ -380,7 +380,7 @@ class Cst {
 		} else {
 			$this->findFiles();
 			
-			$filesToSync = $wpdb->get_results("SELECT * FROM `".CST_TABLE_FILES."` WHERE `synced` = '0'", ARRAY_A);
+			$filesToSync = $wpdb->get_results("SELECT * FROM `".CST_TABLE_FILES."`", ARRAY_A);
 
 			return $filesToSync;
 		}
@@ -407,9 +407,10 @@ class Cst {
 	 */
 	public function syncIndividualFile($file) {
 
-		global $wpdb;
-		$this->createConnection();
-		$this->pushFile($file['file_dir'], $file['remote_path']);
+		echo "The file directory is " . $file['file_dir'] . " and the remote path is " . $file['remote_path'] . '.\n';
+		// global $wpdb;
+		// $this->createConnection();
+		// $this->pushFile($file['file_dir'], $file['remote_path']);
 
 	}
 
