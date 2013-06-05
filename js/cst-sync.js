@@ -35,7 +35,7 @@ jQuery(document).ready(function($) {
 
 			// Upon completion, show the Return to Options Page button
 			$(".cst-progress").ajaxStop(function() {
-				$(this).append('All files synced.');
+				$(this).append('<strong>All files synced.</strong>');
 				$(".cst-progress-return").show();
 			});
 			
