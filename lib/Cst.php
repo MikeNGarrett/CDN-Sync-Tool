@@ -408,16 +408,14 @@ class Cst {
 	 * 
 	 */
 	public function syncIndividualFile($file) {
+		 //global $wpdb;
+		 //$this->createConnection();
+		 //$this->pushFile($file['file_dir'], $file['remote_path']);
 
 		echo 'Beginning pushFile call '.$file['remote_path'].'<br />';
 		$padstr = str_pad("", 512, " ");
 		echo $padstr;
 		echo 'Syncing complete '.$file['remote_path'].'<br />';
-
-		// global $wpdb;
-		// $this->createConnection();
-		// $this->pushFile($file['file_dir'], $file['remote_path']);
-
 	}
 
 	/**
