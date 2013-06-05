@@ -3,6 +3,7 @@ var queueTotal, qCount, queue, time;
 
 function sync() {
 	if(!queue || queue.length <= 0) {
+		upDB(time);
 		return;
 	}
 	var passedFile = queue.shift(); 
@@ -50,15 +51,16 @@ function sync() {
 			}
 
 			// Upon completion, show the Return to Options Page button
+/*
 			$(".cst-progress").ajaxStop(function() {
 				console.log(time);
 				upDB(time);
 			});
+*/
 		},
 		dataType: 'json'
 	});
 
-});
 function upDB(time) {
 	$.ajax({
 		type: "post",
@@ -72,3 +74,5 @@ function upDB(time) {
 		}
 	});
 }
+
+});

@@ -129,9 +129,14 @@ function cst_db_update() {
 	}
 	check_ajax_referer( 'cst_check_string', 'cst_check' );
 	ob_clean(); // clear buffer
+	
+	global $wpdb;
+	
 	$time = $_POST['time'];
 //	$filesToSync = $wpdb->get_results("SELECT * FROM `".CST_TABLE_FILES."` WHERE `synced` = '0'", ARRAY_A);
-//	$resUpdate = $wpdb->query('UPDATE '.CST_TABLE_FILES.' SET synced=1 WHERE changedate<'.$time);	
+	$resUpdate = $wpdb->query('UPDATE '.CST_TABLE_FILES.' SET synced=1 WHERE changedate<'.$time);
+	print('database status:');
+	print_r($resUpdate);
 	die();
 }
 
