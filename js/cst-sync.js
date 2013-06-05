@@ -1,13 +1,13 @@
 jQuery(document).ready(function($) {
 var queueTotal;
+var queue;
 
 function sync() {
-	var queue = readCookie('cstQueue');
-	queue = JSON.parse(queue);
+//	var queue = readCookie('cstQueue');
+//	queue = JSON.parse(queue);
 	if(!queue || queue.length <= 0) {
 		return;
 	}
-	console.log(queueTotal);
 	var passedFile = queue.shift(); // eventually this will be populated by pulling element from cookie-based queue
 	var syncFileData = {
 		action: 'cst_sync_file',
@@ -20,13 +20,15 @@ function sync() {
 		url: syncAjax.ajax_url,
 		data: syncFileData,
 		success: function(response) {
+/*
 			var date = new Date();
 			date.setTime(date.getTime()+(10*24*60*60*1000));
 			var expires = date.toGMTString();
 			var jsonString = JSON.stringify(queue);
 			document.cookie = 'cstQueue='+jsonString+'; expires='+expires+'; path=/';
+*/
 
-			$(".cst-progress").append(response);
+			$(".cst-progress").prepend(response);
 			sync();
 		}
 	});
@@ -42,24 +44,26 @@ function sync() {
 		type: "post",
 		url: syncAjax.ajax_url,
 		data: data,
-		success: function(queue) {
-			queueTotal = queue.length;
-			if (queue.length > 0) {
+		success: function(q) {
+			queueTotal = q.length;
+			if (q.length > 0) {
+				queue = q;
+/*
 				var date = new Date();
 				date.setTime(date.getTime()+(10*24*60*60*1000));
 				var expires = date.toGMTString();
 				var jsonString = JSON.stringify(queue);
 				document.cookie = 'cstQueue='+jsonString+'; expires='+expires+'; path=/';
-
+*/
 				sync();
 			} else { 
 				// either no files or error
-				$(".cst-progress").append(queue);
+				$(".cst-progress").prepend(q);
 			}
 
 			// Upon completion, show the Return to Options Page button
 			$(".cst-progress").ajaxStop(function() {
-				$(this).append('<strong>All files synced.</strong>');
+				$(this).prepend('<strong>All files synced.</strong>');
 				$(".cst-progress-return").show();
 			});
 		},
