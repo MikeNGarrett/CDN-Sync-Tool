@@ -407,16 +407,16 @@ class Cst {
 	 * Syncs an individual file to CDN
 	 * 
 	 */
-	public function syncIndividualFile($file) {
+	public function syncIndividualFile($file, $total) {
 		global $wpdb;
 
 		$this->createConnection();
 
-		echo 'Beginning pushFile call '.$file['remote_path'].'<br />';
+		echo 'Beginning pushFile call ['.$file["id"].'/'.$total.'] '.$file['remote_path'].'<br />';
 		// $this->pushFile($file['file_dir'], $file['remote_path']);
 		$padstr = str_pad("", 512, " ");
 		echo $padstr;
-		echo 'Syncing complete '.$file['remote_path'].'<br />';
+		echo 'Syncing complete ['.$file["id"].'/'.$total.'] '.$file['remote_path'].'<br />';
 	}
 
 	/**

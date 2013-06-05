@@ -11,7 +11,8 @@ function sync() {
 	var syncFileData = {
 		action: 'cst_sync_file',
 		cst_check: syncAjax.cst_check,
-		file: passedFile
+		file: passedFile,
+		total: queue.length
 	};
 	$.ajax({
 		type: "post",
@@ -50,7 +51,7 @@ function sync() {
 
 			// Upon completion, show the Return to Options Page button
 			$(".cst-progress").ajaxStop(function() {
-				$(this).append('All files synced.');
+				$(this).append('<strong>All files synced.</strong>');
 				$(".cst-progress-return").show();
 			});
 			
