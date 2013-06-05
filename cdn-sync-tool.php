@@ -121,6 +121,21 @@ function cst_sync_file() {
 	die();
 }
 
+add_action('wp_ajax_cst_update_db', 'cst_db_update');
+
+function cst_db_update() {
+	if ( !current_user_can( 'manage_options' ) ) {
+		die();
+	}
+	check_ajax_referer( 'cst_check_string', 'cst_check' );
+	ob_clean(); // clear buffer
+	$time = $_POST['time'];
+//	$filesToSync = $wpdb->get_results("SELECT * FROM `".CST_TABLE_FILES."` WHERE `synced` = '0'", ARRAY_A);
+//	$resUpdate = $wpdb->query('UPDATE '.CST_TABLE_FILES.' SET synced=1 WHERE changedate<'.$time);	
+	die();
+}
+
+
 register_activation_hook(__FILE__, "cst_install");
 register_deactivation_hook(__FILE__, 'cst_deactivate');
 add_action('cron_cst_sync', 'hourlySync');

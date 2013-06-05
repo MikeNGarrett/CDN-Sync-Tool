@@ -1,7 +1,5 @@
 jQuery(document).ready(function($) {
-var queueTotal;
-var qCount;
-var queue;
+var queueTotal, qCount, queue, time;
 
 function sync() {
 	if(!queue || queue.length <= 0) {
@@ -41,6 +39,8 @@ function sync() {
 			queueTotal = q.length;
 			qCount = q.length;
 			if (q.length > 0) {
+				var date = new Date();
+				time = date.getTime();
 				$(".cst-progress").before('<div class="status"></div>');
 				queue = q;
 				sync();
@@ -51,12 +51,24 @@ function sync() {
 
 			// Upon completion, show the Return to Options Page button
 			$(".cst-progress").ajaxStop(function() {
-				$(".status").html('Syncing complete!');
-				$(this).append('<strong>All files synced.</strong>');
-				$(".cst-progress-return").show();
+				console.log(time);
+				upDB(time);
 			});
 		},
 		dataType: 'json'
 	});
 
 });
+function upDB(time) {
+	$.ajax({
+		type: "post",
+		url: syncAjax.ajax_url,
+		data: {time: time},
+		success: function(e) {
+			console.log(e);
+			$(".status").html('Syncing complete!');
+			$('.cst-progress').append('<strong>All files synced.</strong>');
+			$(".cst-progress-return").show();
+		}
+	});
+}
