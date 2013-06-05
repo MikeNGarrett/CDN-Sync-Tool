@@ -1,5 +1,6 @@
 jQuery(document).ready(function($) {
 var queueTotal;
+var qCount;
 var queue;
 
 function sync() {
@@ -11,7 +12,8 @@ function sync() {
 		action: 'cst_sync_file',
 		cst_check: syncAjax.cst_check,
 		file: passedFile,
-		total: queueTotal
+		total: queueTotal,
+		current: qCount
 	};
 	$.ajax({
 		type: "post",
@@ -19,6 +21,7 @@ function sync() {
 		data: syncFileData,
 		success: function(response) {
 			$(".cst-progress").append(response);
+			qCount--;
 			sync();
 		}
 	});
@@ -36,6 +39,7 @@ function sync() {
 		data: data,
 		success: function(q) {
 			queueTotal = q.length;
+			qCount = q.length;
 			if (q.length > 0) {
 				queue = q;
 				sync();
