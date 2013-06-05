@@ -380,7 +380,7 @@ class Cst {
 		} else {
 			$this->findFiles();
 			
-			$filesToSync = $wpdb->get_results("SELECT * FROM `".CST_TABLE_FILES."`", ARRAY_A);
+			$filesToSync = $wpdb->get_results("SELECT * FROM `".CST_TABLE_FILES."` WHERE `synced` = '0'", ARRAY_A);
 
 			return $filesToSync;
 		}
