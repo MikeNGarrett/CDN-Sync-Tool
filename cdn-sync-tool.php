@@ -116,9 +116,8 @@ function cst_sync_file() {
 	if(isset( $_POST['file'] )) {
 		$file = filter_var_array($_POST['file'], FILTER_SANITIZE_STRING);
 	}
-	$total = isset($_POST['total']) ? (int) $_POST['total'] : null;
 
-	echo $GLOBALS['core']->syncIndividualFile($file, $total);
+	echo $GLOBALS['core']->syncIndividualFile($file);
 	die();
 }
 
