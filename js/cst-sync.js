@@ -35,8 +35,8 @@ function sync() {
 			var date = new Date();
 			date.setTime(date.getTime()+(10*24*60*60*1000));
 			var expires = date.toGMTString();
-			document.cookie =
-  'cst_queue='+queue='; expires='+expires+'; path=/';
+			var jsonString = JSON.stringify(queue);
+			document.cookie = 'cst_queue='+jsonString+'; expires='+expires+'; path=/';
 			console.log("Number of items: " + queue.length);
 
 			if (queue.length > 0) {
