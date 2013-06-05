@@ -25,10 +25,17 @@ jQuery(document).ready(function($) {
 					$.ajax({
 						type: "post",
 						url: syncAjax.ajax_url,
-						data: syncFileData
+						data: syncFileData,
+						success: function(response) {
+							$(".cst-progress").append(response.message);
+						}
 					});
 				}
 			}
+
+			// Upon completion, show the Return to Options Page button
+			$(".cst-progress").append('All files synced.');
+			$(".cst-progress-return").show();
 			
 			// var doSyncFile = function() {
 			// 	var syncFileData = {

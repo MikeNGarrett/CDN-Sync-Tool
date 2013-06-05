@@ -397,7 +397,9 @@ class Cst {
 		wp_enqueue_script('cst-sync-js', plugins_url('/js/cst-sync.js', CST_FILE));
 		wp_localize_script( 'cst-sync-js', 'syncAjax', array( 'ajax_url' => admin_url( 'admin-ajax.php' ), 'cst_check' => $cst_check) );
 
-		echo 'Enqueueing to directory: ' . CST_DIR . 'js/cst-sync.js';
+		echo '<h2>Syncing Files..</h2>';
+		echo '<div class="cst-progress" style="height: 500px; overflow: auto;">';
+		echo '</div><br /><br /><div class="cst-progress-return" style="display:none;">Return to <a href="'.CST_URL.'?page=cst">CST Options</a>.</div>';
 
 	}
 
@@ -407,7 +409,11 @@ class Cst {
 	 */
 	public function syncIndividualFile($file) {
 
-		echo "The file directory is " . $file['file_dir'] . " and the remote path is " . $file['remote_path'] . '.\n';
+		echo 'Beginning pushFile call '.$file['remote_path'].'<br />';
+		$padstr = str_pad("", 512, " ");
+		echo $padstr;
+		echo 'Syncing complete '.$file['remote_path'].'<br />';
+
 		// global $wpdb;
 		// $this->createConnection();
 		// $this->pushFile($file['file_dir'], $file['remote_path']);
