@@ -34,8 +34,10 @@ jQuery(document).ready(function($) {
 			}
 
 			// Upon completion, show the Return to Options Page button
-			$(".cst-progress").append('All files synced.');
-			$(".cst-progress-return").show();
+			$(".cst-progress").ajaxStop(function() {
+				$(this).append('All files synced.');
+				$(".cst-progress-return").show();
+			});
 			
 			// var doSyncFile = function() {
 			// 	var syncFileData = {
