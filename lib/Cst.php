@@ -406,11 +406,11 @@ class Cst {
 	 * 
 	 */
 	public function syncIndividualFile($file) {
+		 //global $wpdb;
+		 //$this->createConnection();
+		 //$this->pushFile($file['file_dir'], $file['remote_path']);
 
-		echo "The file directory is " . $file['file_dir'] . " and the remote path is " . $file['remote_path'] . '.\n';
-		// global $wpdb;
-		// $this->createConnection();
-		// $this->pushFile($file['file_dir'], $file['remote_path']);
+		return "The file directory is " . $file['file_dir'] . " and the remote path is " . $file['remote_path'] . '.\n';
 
 	}
 

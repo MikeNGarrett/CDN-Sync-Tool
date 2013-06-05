@@ -111,8 +111,14 @@ function cst_sync_file() {
 	}
 	check_ajax_referer( 'cst_check_string', 'cst_check' );
 	ob_clean(); // clear buffer
-	$file = ( isset( $_POST['file'] ) ) ? $_POST['file'] : '';
-	$GLOBALS['core']->syncIndividualFile($file);
+
+	$file = '';
+	if(isset( $_POST['file'] )) {
+//		$file = json_decode($_POST['file']);
+		$file = filter_var_array($_POST['file'], FILTER_SANITIZE_STRING);
+	}
+
+	echo $GLOBALS['core']->syncIndividualFile($file);
 	die();
 }
 
