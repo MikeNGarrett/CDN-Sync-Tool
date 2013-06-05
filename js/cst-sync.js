@@ -1,34 +1,27 @@
 jQuery(document).ready(function($) {
 var queueTotal;
+var qCount;
 var queue;
 
 function sync() {
-//	var queue = readCookie('cstQueue');
-//	queue = JSON.parse(queue);
 	if(!queue || queue.length <= 0) {
 		return;
 	}
-	var passedFile = queue.shift(); // eventually this will be populated by pulling element from cookie-based queue
+	var passedFile = queue.shift(); 
 	var syncFileData = {
 		action: 'cst_sync_file',
 		cst_check: syncAjax.cst_check,
 		file: passedFile,
-		total: queueTotal
+		total: queueTotal,
+		current: qCount
 	};
 	$.ajax({
 		type: "post",
 		url: syncAjax.ajax_url,
 		data: syncFileData,
 		success: function(response) {
-/*
-			var date = new Date();
-			date.setTime(date.getTime()+(10*24*60*60*1000));
-			var expires = date.toGMTString();
-			var jsonString = JSON.stringify(queue);
-			document.cookie = 'cstQueue='+jsonString+'; expires='+expires+'; path=/';
-*/
-
-			$(".cst-progress").prepend(response);
+			$(".cst-progress").append(response);
+			qCount--;
 			sync();
 		}
 	});
@@ -46,24 +39,18 @@ function sync() {
 		data: data,
 		success: function(q) {
 			queueTotal = q.length;
+			qCount = q.length;
 			if (q.length > 0) {
 				queue = q;
-/*
-				var date = new Date();
-				date.setTime(date.getTime()+(10*24*60*60*1000));
-				var expires = date.toGMTString();
-				var jsonString = JSON.stringify(queue);
-				document.cookie = 'cstQueue='+jsonString+'; expires='+expires+'; path=/';
-*/
 				sync();
 			} else { 
 				// either no files or error
-				$(".cst-progress").prepend(q);
+				$(".cst-progress").append(q);
 			}
 
 			// Upon completion, show the Return to Options Page button
 			$(".cst-progress").ajaxStop(function() {
-				$(this).prepend('<strong>All files synced.</strong>');
+				$(this).append('<strong>All files synced.</strong>');
 				$(".cst-progress-return").show();
 			});
 		},
@@ -71,13 +58,3 @@ function sync() {
 	});
 
 });
-function readCookie(name) {
-	var nameEQ = name + "=";
-	var ca = document.cookie.split(';');
-	for(var i=0;i < ca.length;i++) {
-		var c = ca[i];
-		while (c.charAt(0)==' ') c = c.substring(1,c.length);
-		if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
-	}
-	return null;
-}
