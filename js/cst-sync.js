@@ -13,8 +13,18 @@ jQuery(document).ready(function($) {
 			var queue = response;
 			alert("Number of items: " + queue.length);
 			// for (var x = 0; x < response.length; x++) {
-			for (var x = 0; x < 3; x++) {
+			for (var x = 0; x < 1; x++) {
 				alert("The ID for index " + x + " is: " + queue[x].id);
+				var syncFileData = {
+					action: 'cst_sync_file',
+					cst_check: syncAjax.cst_check,
+					item: queue[x]
+				};
+				$.ajax({
+					type: "post",
+					url: syncAjax.ajax_url,
+					data: syncFileData
+				});
 			}
 			//alert(response.length);
 			// alert('Before entering the variable doSyncFile, the value of i is: ' + i);
