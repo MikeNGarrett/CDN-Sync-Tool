@@ -320,6 +320,8 @@ class Cst {
 	private function _addFilesToDb($files) {
 		global $wpdb;
 
+		// add in check to make sure files exist. 
+
 		// Adds file to db
 		foreach($files as $file) {
 
@@ -335,6 +337,7 @@ class Cst {
 			}
 
 			$row = $wpdb->get_row("SELECT * FROM `".CST_TABLE_FILES."` WHERE `remote_path` = '".$remotePath."'");
+
 
 			$changedate = filemtime($file);
 
