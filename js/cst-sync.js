@@ -11,7 +11,8 @@ function sync() {
 	var syncFileData = {
 		action: 'cst_sync_file',
 		cst_check: syncAjax.cst_check,
-		file: passedFile
+		file: passedFile,
+		total: queue.length
 	};
 	$.ajax({
 		type: "post",
