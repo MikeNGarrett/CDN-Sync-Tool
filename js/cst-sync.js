@@ -12,14 +12,14 @@ function sync() {
 		action: 'cst_sync_file',
 		cst_check: syncAjax.cst_check,
 		file: passedFile,
-		total: queueTotal,
-		current: qCount
-	};
+		total: queueTotal
+		};
 	$.ajax({
 		type: "post",
 		url: syncAjax.ajax_url,
 		data: syncFileData,
 		success: function(response) {
+			$(".status").html('Syncing '+(qCount - 1)+' of '+queueTotal);
 			$(".cst-progress").append(response);
 			qCount--;
 			sync();
@@ -41,6 +41,7 @@ function sync() {
 			queueTotal = q.length;
 			qCount = q.length;
 			if (q.length > 0) {
+				$(".cst-progress").before('<div class="status"></div>');
 				queue = q;
 				sync();
 			} else { 
@@ -50,6 +51,7 @@ function sync() {
 
 			// Upon completion, show the Return to Options Page button
 			$(".cst-progress").ajaxStop(function() {
+				$(".status").html('Syncing complete!');
 				$(this).append('<strong>All files synced.</strong>');
 				$(".cst-progress-return").show();
 			});
