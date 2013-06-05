@@ -366,6 +366,19 @@ class Cst {
 		global $wpdb;
 
 		$this->createConnection();
+			
+		$filesToSync = $wpdb->get_results("SELECT * FROM `".CST_TABLE_FILES."` WHERE `synced` = '0'", ARRAY_A);
+		return $filesToSync;
+	}
+
+	/**
+	 * Syncs all required files to CDN
+	 * 
+	 */
+	public function syncFiles() {
+		$cst_check = wp_create_nonce("cst_check_string");
+
+		$this->createConnection();
 
 		if (isset(CST_Page::$messages) && !empty(CST_Page::$messages)) {
 			foreach (CST_Page::$messages as $message) {
@@ -379,20 +392,7 @@ class Cst {
 			return false;
 		} else {
 			$this->findFiles();
-			
-			$filesToSync = $wpdb->get_results("SELECT * FROM `".CST_TABLE_FILES."` WHERE `synced` = '0'", ARRAY_A);
-
-			return $filesToSync;
 		}
-	}
-
-	/**
-	 * Syncs all required files to CDN
-	 * 
-	 */
-	public function syncFiles() {
-
-		$cst_check = wp_create_nonce("cst_check_string");
 
 		wp_enqueue_script('cst-sync-js', plugins_url('/js/cst-sync.js', CST_FILE));
 		wp_localize_script( 'cst-sync-js', 'syncAjax', array( 'ajax_url' => admin_url( 'admin-ajax.php' ), 'cst_check' => $cst_check) );
