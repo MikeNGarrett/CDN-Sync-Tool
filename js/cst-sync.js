@@ -1,36 +1,53 @@
 jQuery(document).ready(function($) {
-var queueTotal, qCount, queue, time;
+	var queueTotal, qCount, queue, time;
 
-function sync() {
-	if(!queue || queue.length <= 0) {
-		upDB(time);
-		return;
+	// function upDB is called to update the CDN Sync Tool database upon completion
+	function upDB(time) {
+		$.ajax({
+			type: "post",
+			url: syncAjax.ajax_url,
+			data: {action: 'cst_update_db', cst_check: syncAjax.cst_check, time: time},
+			success: function(e) {
+				console.log(e);
+				$(".status").html('Syncing complete!');
+				$('.cst-progress').append('<strong>All files synced.</strong>');
+				$(".cst-progress-return").show();
+			}
+		});
 	}
-	var passedFile = queue.shift(); 
-	var syncFileData = {
-		action: 'cst_sync_file',
-		cst_check: syncAjax.cst_check,
-		file: passedFile,
-		total: queueTotal
-		};
-	$.ajax({
-		type: "post",
-		url: syncAjax.ajax_url,
-		data: syncFileData,
-		success: function(response) {
-			$(".status").html('Syncing '+(qCount - 1)+' of '+queueTotal);
-			$(".cst-progress").append(response);
-			qCount--;
-			sync();
+
+	// function sync is called recursively to sync individual files to the CDN
+	function sync() {
+		if(!queue || queue.length <= 0) {
+			upDB(time);
+			return;
 		}
-	});
-}
+		var passedFile = queue.shift(); 
+		var syncFileData = {
+			action: 'cst_sync_file',
+			cst_check: syncAjax.cst_check,
+			file: passedFile,
+			total: queueTotal
+			};
+		$.ajax({
+			type: "post",
+			url: syncAjax.ajax_url,
+			data: syncFileData,
+			success: function(response) {
+				$(".status").html('Syncing '+(qCount - 1)+' of '+queueTotal);
+				$(".cst-progress").append(response);
+				qCount--;
+				sync();
+			}
+		});
+	}
 
-
+	// parameters to retrieve CDN queue
 	var data = {
 		action: 'cst_get_queue',
 		cst_check: syncAjax.cst_check
 	};
+
 	// We can also pass the url value separately from ajaxurl for front end AJAX implementations
 	$.ajax({
 		type: "post",
@@ -48,6 +65,8 @@ function sync() {
 			} else { 
 				// either no files or error
 				$(".cst-progress").append(q);
+				$('.cst-progress').append('<strong>No files were available for syncing (or an error was encountered).</strong>');
+				$(".cst-progress-return").show();
 			}
 
 			// Upon completion, show the Return to Options Page button
@@ -60,19 +79,5 @@ function sync() {
 		},
 		dataType: 'json'
 	});
-
-function upDB(time) {
-	$.ajax({
-		type: "post",
-		url: syncAjax.ajax_url,
-		data: {action: 'cst_update_db', cst_check: syncAjax.cst_check, time: time},
-		success: function(e) {
-			console.log(e);
-			$(".status").html('Syncing complete!');
-			$('.cst-progress').append('<strong>All files synced.</strong>');
-			$(".cst-progress-return").show();
-		}
-	});
-}
 
 });
