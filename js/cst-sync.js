@@ -65,7 +65,7 @@ function upDB(time) {
 	$.ajax({
 		type: "post",
 		url: syncAjax.ajax_url,
-		data: {time: time},
+		data: {action: 'cst_update_db', cst_check: syncAjax.cst_check, time: time},
 		success: function(e) {
 			console.log(e);
 			$(".status").html('Syncing complete!');
