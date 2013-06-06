@@ -132,10 +132,7 @@ function cst_db_update() {
 	
 	global $wpdb;
 	
-	$time = $_POST['time'];
-//	$filesToSync = $wpdb->get_results("SELECT * FROM `".CST_TABLE_FILES."` WHERE `synced` = '0'", ARRAY_A);
-//	$resUpdate = $wpdb->query("UPDATE ".CST_TABLE_FILES." SET `synced` = '1' WHERE `changedate` > '0'"); // WHERE changedate<'.$time
-//	$resUpdate = $wpdb->update(CST_TABLE_FILES, array('synced' => '1'), array('synced' => '0'));
+	$time = (int) $_POST['time']; // time has been included as parameter, in the event that it is needed for future development (e.g. WHERE statement for SQL update)
 	$resUpdate = $wpdb->update(
 					CST_TABLE_FILES,
 					array(

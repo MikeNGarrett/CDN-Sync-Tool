@@ -416,7 +416,7 @@ class Cst {
 		$this->createConnection();
 
 		echo 'Beginning pushFile call: '.$file['remote_path'].'<br />';
-		// $this->pushFile($file['file_dir'], $file['remote_path']);
+		$this->pushFile($file['file_dir'], $file['remote_path']);
 		$padstr = str_pad("", 512, " ");
 		echo $padstr;
 		echo 'Syncing complete: '.$file['remote_path'].'<br /><hr />';

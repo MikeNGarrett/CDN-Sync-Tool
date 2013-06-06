@@ -8,7 +8,6 @@ jQuery(document).ready(function($) {
 			url: syncAjax.ajax_url,
 			data: {action: 'cst_update_db', cst_check: syncAjax.cst_check, time: time},
 			success: function(e) {
-				console.log(e);
 				$(".status").html('Syncing complete!');
 				$('.cst-progress').append('<strong>All files synced.</strong>');
 				$(".cst-progress-return").show();
@@ -34,7 +33,7 @@ jQuery(document).ready(function($) {
 			url: syncAjax.ajax_url,
 			data: syncFileData,
 			success: function(response) {
-				$(".status").html('Syncing '+(qCount - 1)+' of '+queueTotal);
+				$(".status").html('Syncing in progress - do not close this window. Syncing '+(qCount - 1)+' of '+queueTotal);
 				$(".cst-progress").append(response);
 				qCount--;
 				sync();
