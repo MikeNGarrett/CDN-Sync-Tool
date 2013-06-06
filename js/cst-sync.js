@@ -77,6 +77,12 @@ jQuery(document).ready(function($) {
 			});
 */
 		},
+		error: function(xhr, textStatus, errorThrown) {
+			$('.cst-progress').append('<strong>There was an error in retrieving the list of files to sync.</strong>');
+			$('.cst-progress').append('Text status: ' + textStatus + '<br /><br />');
+			$('.cst-progress').append('Error thrown: ' + errorThrown + '<br /><br />');
+			$(".cst-progress-return").show();
+		}
 		dataType: 'json'
 	});
 
