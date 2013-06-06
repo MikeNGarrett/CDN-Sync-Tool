@@ -65,24 +65,16 @@ jQuery(document).ready(function($) {
 			} else { 
 				// either no files or error
 				$(".cst-progress").append(q);
-				$('.cst-progress').append('<strong>No files were available for syncing (or an error was encountered).</strong>');
+				$('.cst-progress').append('<strong>No files needed to be synced.</strong>');
 				$(".cst-progress-return").show();
 			}
-
-			// Upon completion, show the Return to Options Page button
-/*
-			$(".cst-progress").ajaxStop(function() {
-				console.log(time);
-				upDB(time);
-			});
-*/
 		},
 		error: function(xhr, textStatus, errorThrown) {
-			$('.cst-progress').append('<strong>There was an error in retrieving the list of files to sync.</strong>');
-			$('.cst-progress').append('Text status: ' + textStatus + '<br /><br />');
-			$('.cst-progress').append('Error thrown: ' + errorThrown + '<br /><br />');
+			$('.cst-progress').append('<strong>There was an error in retrieving the list of files to sync.</strong><br />');
+			$('.cst-progress').append('Text status: ' + textStatus + '<br />');
+			$('.cst-progress').append('Error thrown: ' + errorThrown + '<br />');
 			$(".cst-progress-return").show();
-		}
+		},
 		dataType: 'json'
 	});
 
