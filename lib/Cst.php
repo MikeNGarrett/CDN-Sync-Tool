@@ -268,6 +268,17 @@ class Cst {
 			$files[] = ABSPATH.'wp-includes';
 			$mediaFiles = $this->getMediaFiles();
 		}
+		if (isset($_POST['cst-options']['syncfiles']['plugin'])) {
+			$activePlugins = $this->getActivePlugins();
+			foreach ( $activePlugins as $i => $plugin ) {
+				$dirname = dirname(WP_PLUGIN_DIR."/".$plugin);
+				// echo 'Plugin ' . $i . ': ' . $dirname . '<br />';
+				if ($dirname != dirname(WP_PLUGIN_DIR."/plugins")) {
+					// echo 'Adding to queue <br />';
+					$files[] = $dirname;
+				}
+			}
+		}
 
 		$files = $this->getDirectoryFiles($files);
 
@@ -310,6 +321,19 @@ class Cst {
 			}
 		}
 		self::_addFilesToDb($files);
+	}
+
+	/**
+	 * Get all active plugins
+	 */
+	public static function getActivePlugins(){
+		
+		global $wpdb;
+		$activePlugins = (is_array(get_site_option("active_sitewide_plugins")) === true) ? array_keys(get_site_option("active_sitewide_plugins")) : array();
+		$activePlugins = array_merge( $activePlugins , get_option("active_plugins") );	
+		$activePlugins = array_merge( $activePlugins , array_keys(get_mu_plugins()));	
+		
+		return $activePlugins;
 	}
 
 	/**
