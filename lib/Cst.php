@@ -264,9 +264,11 @@ class Cst {
 			$files[] = get_stylesheet_directory();
 		if (isset($_POST['cst-options']['syncfiles']['theme']))
 			$files[] = get_template_directory();
-		if (isset($_POST['cst-options']['syncfiles']['media'])) {
+		if (isset($_POST['cst-options']['syncfiles']['wp']))
 			$files[] = ABSPATH.'wp-includes';
-			$mediaFiles = $this->getMediaFiles();
+		if (isset($_POST['cst-options']['syncfiles']['media'])) {
+			$uploadDir = wp_upload_dir();
+			$files[] = $uploadDir['basedir'];
 		}
 		if (isset($_POST['cst-options']['syncfiles']['plugin'])) {
 			$activePlugins = $this->getActivePlugins();
@@ -299,13 +301,12 @@ class Cst {
 				$combinedCssJs[] = ABSPATH.get_option('cst-js-savepath');
 			}
 			$combinedCssJs = $this->getDirectoryFiles($combinedCssJs);
-		}
-
-		if (isset($_POST['cst-options']['syncfiles']['media'])) {
-			$files = array_merge($files, $mediaFiles);
 			if (isset($combinedCssJs) && !empty($combinedCssJs))
 				$files = array_merge($files, $combinedCssJs);
 		}
+		// if (isset($_POST['cst-options']['syncfiles']['media'])) {
+		// 	$files = array_merge($files, $mediaFiles);
+		// }
 
 		if (get_option('cst-js-minify') == 'yes') {
 			if (get_option('cst-js-combine') == 'yes' && file_exists(ABSPATH.get_option('cst-js-savepath').'/cst-combined.js')) {
