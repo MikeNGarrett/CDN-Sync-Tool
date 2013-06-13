@@ -346,10 +346,24 @@ class Cst {
 
 		// add in check to make sure files exist. 
 
+		// first, determine the relative path for uploads so we can identify them
+		$uploadDir = wp_upload_dir();
+		$uploadDirPath = $uploadDir['basedir'];
+		$uploadFullUrl = $uploadDir['baseurl'];
+		$uploadRelUrl = ltrim(str_replace(get_bloginfo('url'),'',$uploadFullUrl),'/');
+		// echo 'uploadDir: ' . $uploadDir . '<br />';
+		// echo 'uploadDirPath: ' . $uploadDirPath . '<br />';
+		// echo 'uploadFullUrl: ' . $uploadFullUrl . '<br />';
+		// echo 'uploadRelUrl: ' . $uploadRelUrl . '<br />';
+
 		// Adds file to db
 		foreach($files as $file) {
+			// echo 'File: ' . $file . '<br />';
 
-			if (stristr($file, 'wp-content')) {
+			if (stristr($file, $uploadDirPath)) {
+				$remotePath = preg_split('$'.$uploadDirPath.'$', $file);
+				$remotePath = $uploadRelUrl.$remotePath[1];
+			} else if (stristr($file, 'wp-content')) {
 				$remotePath = preg_split('$wp-content$', $file);
 				$remotePath = 'wp-content'.$remotePath[1];
 			} else if (stristr($file, 'wp-includes')) {
