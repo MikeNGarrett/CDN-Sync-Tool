@@ -12,6 +12,46 @@
 class Cst {
 	protected $cdnConnection, $connectionType, $fileTypes, $ftpHome;
 
+	private $_uploadDir = null; 
+	private $_uploadDirPath = null; 
+	private $_uploadFullUrl = null;
+	private $_uploadRelUrl = null;
+
+	private function getUploadDir() {
+		if( !$this->_uploadDir ) {
+			$this->_uploadDir = wp_upload_dir();
+		}
+
+		return $this->_uploadDir;
+	}
+
+	private function getUploadDirPath() {
+		if( !$this->_uploadDirPath ) {
+			$tempDir = $this->getUploadDir();
+			$this->_uploadDirPath = $tempDir['basedir'];
+		}
+
+		return $this->_uploadDirPath;
+	}
+
+	private function getUploadFullUrl() {
+		if( !$this->_uploadFullUrl ) {
+			$tempDir = $this->getUploadDir();
+			$this->_uploadFullUrl = $tempDir['baseurl'];
+		}
+
+		return $this->_uploadFullUrl;
+	}
+
+	private function getUploadRelUrl() {
+		if( !$this->_uploadRelUrl ) {
+			$tempUploadFullUrl = $this->getUploadFullUrl();
+			$this->_uploadRelUrl = ltrim(str_replace(get_bloginfo('url'),'',$tempUploadFullUrl),'/');
+		}
+
+		return $this->_uploadRelUrl;
+	}
+
 	function __construct() {
 		$this->connectionType = get_option('cst-cdn');
 		add_action('admin_menu', array($this, 'createPages'));
@@ -25,10 +65,25 @@ class Cst {
 		add_action( 'wp_handle_upload', array( $this, 'wp_handle_upload' ), 20, 2 );
 
 		// Add action for image uploads
-		add_action('wp_generate_attachment_metadata', array($this, 'uploadMedia'));
-
-
+		add_action('wp_update_attachment_metadata', array($this, 'uploadMedia'));
 	}
+
+	public function getPath($strPath){
+		$strCachePath = realpath($strPath);
+		if( !$strCachePath ){
+			mkdir($strPath);
+			$strCachePath = realpath($strPath);
+		}
+		return $strCachePath;
+	}
+
+	public function checkTouch($strFlPth = false){
+		if( !file_exists($strFlPth) ) {
+			touch($strFlPth);
+		}
+		return $strFlPth;
+	}
+
 	public function wp_handle_upload( $data, $type ) {
 		$check_type = explode('/', $data['type']);
 	    if ( $check_type[0] != 'image' ) {
@@ -338,42 +393,49 @@ class Cst {
 	}
 
 	/**
+	 * Using the path of a given file, generate the remote path
+	 * 
+	 * @param $file string for file path
+	 */
+	private function generateRemotePath($file) {
+		// retrieve pointers to the upload directory path and the relative upload url
+		$uploadDir = wp_upload_dir();
+		$uploadDirPath = $this->getUploadDirPath();
+		$uploadFullUrl = $this->getUploadFullUrl();
+		$uploadRelUrl = ltrim(str_replace(get_bloginfo('url'),'',$uploadFullUrl),'/');
+
+		if (stristr($file, $uploadDirPath)) {
+			$remotePath = preg_split('$'.$uploadDirPath.'$', $file);
+			$remotePath = $uploadRelUrl.$remotePath[1];
+		} else if (stristr($file, 'wp-content')) {
+			$remotePath = preg_split('$wp-content$', $file);
+			$remotePath = 'wp-content'.$remotePath[1];
+		} else if (stristr($file, 'wp-includes')) {
+			$remotePath = preg_split('$wp-includes$', $file);
+			$remotePath = 'wp-includes'.$remotePath[1];
+		} else if (stristr($file, ABSPATH)) {
+			$remotePath = preg_split('$'.ABSPATH.'$', $file);
+			$remotePath = $remotePath[1];
+		}
+		return $remotePath;
+	}
+
+	/**
 	 * Adds the files to the database
 	 * 
 	 * @param $files array of file paths
 	 */
-	private function _addFilesToDb($files) {
+	private function _addFilesToDb($files, $forceSynced = null) {
 		global $wpdb;
 
 		// add in check to make sure files exist. 
 
 		// first, determine the relative path for uploads so we can identify them
-		$uploadDir = wp_upload_dir();
-		$uploadDirPath = $uploadDir['basedir'];
-		$uploadFullUrl = $uploadDir['baseurl'];
-		$uploadRelUrl = ltrim(str_replace(get_bloginfo('url'),'',$uploadFullUrl),'/');
-		// echo 'uploadDir: ' . $uploadDir . '<br />';
-		// echo 'uploadDirPath: ' . $uploadDirPath . '<br />';
-		// echo 'uploadFullUrl: ' . $uploadFullUrl . '<br />';
-		// echo 'uploadRelUrl: ' . $uploadRelUrl . '<br />';
 
-		// Adds file to db
 		foreach($files as $file) {
-			// echo 'File: ' . $file . '<br />';
+			// first, determine the relative path for uploads so we can identify them
 
-			if (stristr($file, $uploadDirPath)) {
-				$remotePath = preg_split('$'.$uploadDirPath.'$', $file);
-				$remotePath = $uploadRelUrl.$remotePath[1];
-			} else if (stristr($file, 'wp-content')) {
-				$remotePath = preg_split('$wp-content$', $file);
-				$remotePath = 'wp-content'.$remotePath[1];
-			} else if (stristr($file, 'wp-includes')) {
-				$remotePath = preg_split('$wp-includes$', $file);
-				$remotePath = 'wp-includes'.$remotePath[1];
-			} else if (stristr($file, ABSPATH)) {
-				$remotePath = preg_split('$'.ABSPATH.'$', $file);
-				$remotePath = $remotePath[1];
-			}
+			$remotePath = $this->generateRemotePath($file);
 
 			$row = $wpdb->get_row("SELECT * FROM `".CST_TABLE_FILES."` WHERE `remote_path` = '".$remotePath."'");
 
@@ -383,7 +445,7 @@ class Cst {
 			if ((!empty($row) && $changedate != $row->changedate) || (isset($_POST['cst-options']['syncall']) && $row != NULL)) {
 				$wpdb->update(
 					CST_TABLE_FILES,
-					array('changedate' => $changedate, 'synced' => '0'),
+					array('changedate' => $changedate, 'synced' => (!$forceSynced ? '0' : '1')),
 					array('remote_path' => $remotePath)
 				);
 			} else if (!isset($row) || empty($row)) {
@@ -393,7 +455,7 @@ class Cst {
 	        			'file_dir' => $file,
 	      			    'remote_path' => $remotePath,
 	    			    'changedate' => filemtime($file),
-	   	 			    'synced' => '0'
+	   	 			    'synced' => (!$forceSynced ? '0' : '1')
 					)
 				);
 			}
@@ -534,25 +596,35 @@ class Cst {
 		return $files;
 	}
 
-	public function uploadMedia($meta) {
+	public function uploadMedia($post_id, $data) {
 		self::createConnection();
-		if(count($meta) < 1 && !isset($meta['file'])) {
-			$filepath = $this->_file;
-			$name = str_replace(ABSPATH, '', $filepath);
-		} else {
-			$uploaddir = wp_upload_dir(); 
-			$uploaddir = $uploaddir['basedir'].'/';
-			$name = str_replace(ABSPATH, '', $uploaddir).$meta['file'];
-			$filepath = $uploaddir.$meta['file'];
-		}
-		self::pushFile($filepath, $name);
-		if (isset($meta['sizes']) && is_array($meta['sizes']) && !empty($meta['sizes'])) {
-			foreach($meta['sizes'] as $size) {
-				$dirname = dirname($meta['file']).'/';
-				self::pushFile($uploaddir.$dirname.$size['file'], str_replace(ABSPATH, '', $uploaddir).$dirname.$size['file']);
+
+		$uploaddir = wp_upload_dir();
+		$uploadFullDir = $uploaddir['path'].'/';
+		$uploaddir = $uploaddir['basedir'].'/';
+		$filepath = $uploaddir.$post_id['file'];
+
+		$files = array();
+		$files[] = $filepath;
+
+		// Add other filesizes
+		if (isset($post_id['sizes']) && is_array($post_id['sizes']) && !empty($post_id['sizes'])) {
+			foreach($post_id['sizes'] as $size) {
+				$filepath = $uploadFullDir.$size['file'];
+				$files[] = $filepath;
 			}
 		}
-		return $meta;
+
+		// add files to DB, setting them as synced (since we are syncing now)
+		self::_addFilesToDb($files, $forceSynced=true);
+
+		// iterate through files and push to CDN
+		foreach ($files as $file) {
+			$remotePath = $this->generateRemotePath($file);
+			self::pushFile($file, $remotePath);
+		}
+
+		return $post_id;
 	}
 
 	public function createNonce() {
