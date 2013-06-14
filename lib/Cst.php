@@ -599,19 +599,28 @@ class Cst {
 	public function uploadMedia($post_id, $data) {
 		self::createConnection();
 
-		$uploaddir = wp_upload_dir();
-		$uploadFullDir = $uploaddir['path'].'/';
-		$uploaddir = $uploaddir['basedir'].'/';
-		$filepath = $uploaddir.$post_id['file'];
+		$files = array(); // initialize array of files. we will add any uploaded pathnames that need to be synced
 
-		$files = array();
-		$files[] = $filepath;
+		// if this is not an image, add the filepath specified via wp_handle_upload hook
+		if(count($post_id) < 1 && !isset($post_id['file'])) {
+			$filepath = $this->_file;
+			$files[] = $filepath;
+		}
+		// else add the passed image file path, along with any additional image sizes
+		else {
+			$uploaddir = wp_upload_dir();
+			$uploadFullDir = $uploaddir['path'].'/';
+			$uploaddir = $uploaddir['basedir'].'/';
+			$filepath = $uploaddir.$post_id['file'];
 
-		// Add other filesizes
-		if (isset($post_id['sizes']) && is_array($post_id['sizes']) && !empty($post_id['sizes'])) {
-			foreach($post_id['sizes'] as $size) {
-				$filepath = $uploadFullDir.$size['file'];
-				$files[] = $filepath;
+			$files[] = $filepath;
+
+			// Add other filesizes
+			if (isset($post_id['sizes']) && is_array($post_id['sizes']) && !empty($post_id['sizes'])) {
+				foreach($post_id['sizes'] as $size) {
+					$filepath = $uploadFullDir.$size['file'];
+					$files[] = $filepath;
+				}
 			}
 		}
 
