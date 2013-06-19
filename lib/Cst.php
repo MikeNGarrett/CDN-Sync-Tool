@@ -12,44 +12,54 @@
 class Cst {
 	protected $cdnConnection, $connectionType, $fileTypes, $ftpHome;
 
-	private $_uploadDir = null; 
-	private $_uploadDirPath = null; 
-	private $_uploadFullUrl = null;
-	private $_uploadRelUrl = null;
+	private $_uploadDirArray = null; 
+	private $_uploadBasedir = null; 
+	private $_uploadBaseurl = null;
+	private $_uploadRelurl = null;
+	private $_uploadPath = null;
 
-	private function getUploadDir() {
-		if( !$this->_uploadDir ) {
-			$this->_uploadDir = wp_upload_dir();
+	private function getUploadDirArray() {
+		if( !$this->_uploadDirArray ) {
+			$this->_uploadDirArray = wp_upload_dir();
 		}
 
-		return $this->_uploadDir;
+		return $this->_uploadDirArray;
 	}
 
-	private function getUploadDirPath() {
-		if( !$this->_uploadDirPath ) {
-			$tempDir = $this->getUploadDir();
-			$this->_uploadDirPath = $tempDir['basedir'];
+	private function getUploadBasedir() {
+		if( !$this->_uploadBasedir ) {
+			$tempDir = $this->getUploadDirArray();
+			$this->_uploadBasedir = $tempDir['basedir'];
 		}
 
-		return $this->_uploadDirPath;
+		return $this->_uploadBasedir;
 	}
 
-	private function getUploadFullUrl() {
-		if( !$this->_uploadFullUrl ) {
-			$tempDir = $this->getUploadDir();
-			$this->_uploadFullUrl = $tempDir['baseurl'];
+	private function getUploadBaseurl() {
+		if( !$this->_uploadBaseurl ) {
+			$tempDir = $this->getUploadDirArray();
+			$this->_uploadBaseurl = $tempDir['baseurl'];
 		}
 
-		return $this->_uploadFullUrl;
+		return $this->_uploadBaseurl;
 	}
 
-	private function getUploadRelUrl() {
-		if( !$this->_uploadRelUrl ) {
-			$tempUploadFullUrl = $this->getUploadFullUrl();
-			$this->_uploadRelUrl = ltrim(str_replace(get_bloginfo('url'),'',$tempUploadFullUrl),'/');
+	private function getUploadRelurl() {
+		if( !$this->_uploadRelurl ) {
+			$tempUploadBaseurl = $this->getUploadBaseurl();
+			$this->_uploadRelurl = ltrim(str_replace(get_bloginfo('url'),'',$tempUploadBaseurl),'/');
 		}
 
-		return $this->_uploadRelUrl;
+		return $this->_uploadRelurl;
+	}
+
+	private function getUploadPath() {
+		if( !$this->_uploadPath ) {
+			$tempDir = $this->getUploadDirArray();
+			$this->_uploadPath = $tempDir['path'];
+		}
+
+		return $this->_uploadPath;
 	}
 
 	function __construct() {
@@ -306,7 +316,7 @@ class Cst {
 		if (isset($_POST['cst-options']['syncfiles']['wp']))
 			$files[] = ABSPATH.'wp-includes';
 		if (isset($_POST['cst-options']['syncfiles']['media'])) {
-			$files[] = $this->getUploadDirPath(); // add the base upload directory
+			$files[] = $this->getUploadBasedir(); // add the base upload directory
 		}
 		if (isset($_POST['cst-options']['syncfiles']['plugin'])) {
 			$activePlugins = $this->getActivePlugins();
@@ -382,14 +392,14 @@ class Cst {
 	 */
 	private function generateRemotePath($file) {
 		// retrieve pointers to the upload directory path and the relative upload url
-		$uploadDir = $this->getUploadDir();
-		$uploadDirPath = $this->getUploadDirPath();
-		$uploadFullUrl = $this->getUploadFullUrl();
-		$uploadRelUrl = ltrim(str_replace(get_bloginfo('url'),'',$uploadFullUrl),'/');
+		$uploadDirArray = $this->getUploadDirArray();
+		$uploadBasedir = $this->getUploadBasedir();
+		$uploadBaseurl = $this->getUploadBaseurl();
+		$uploadRelurl = $this->getUploadRelurl();
 
-		if (stristr($file, $uploadDirPath)) {
-			$remotePath = preg_split('$'.$uploadDirPath.'$', $file);
-			$remotePath = $uploadRelUrl.$remotePath[1];
+		if (stristr($file, $uploadBasedir)) {
+			$remotePath = preg_split('$'.$uploadBasedir.'$', $file);
+			$remotePath = $uploadRelurl.$remotePath[1];
 		} else if (stristr($file, 'wp-content')) {
 			$remotePath = preg_split('$wp-content$', $file);
 			$remotePath = 'wp-content'.$remotePath[1];
@@ -541,9 +551,9 @@ class Cst {
 							 ON pmt.post_id = pmo.post_id 
 							 AND pmt.meta_key = '_wp_attachment_metadata'   
 							 WHERE pmo.meta_key = '_wp_attached_file'",ARRAY_A );
-		$uploadDir = $this->getUploadDirPath().'/';
+		$uploadBasedir = $this->getUploadBasedir();
 		foreach($files as $file) {
-			$mediaFiles[] = $uploadDir.$file['filename'];
+			$mediaFiles[] = $uploadBasedir.'/'.$file['filename'];
 		}
 		return $mediaFiles;
 	}
@@ -590,16 +600,14 @@ class Cst {
 		}
 		// else add the passed image file path, along with any additional image sizes
 		else {
-			$uploaddir = $this->getUploadDir();
-			$uploadFullDir = $uploaddir['path'].'/';
-			$filepath = $this->getUploadDirPath().'/'.$post_id['file'];
-
+			$filepath = $this->getUploadBasedir().'/'.$post_id['file'];
 			$files[] = $filepath;
 
 			// Add other filesizes
 			if (isset($post_id['sizes']) && is_array($post_id['sizes']) && !empty($post_id['sizes'])) {
+				$uploadPath = $this->getUploadPath();
 				foreach($post_id['sizes'] as $size) {
-					$filepath = $uploadFullDir.$size['file'];
+					$filepath = $uploadPath.'/'.$size['file'];
 					$files[] = $filepath;
 				}
 			}
