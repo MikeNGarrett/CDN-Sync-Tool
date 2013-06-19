@@ -121,9 +121,9 @@ function cst_sync_file() {
 	die();
 }
 
-add_action('wp_ajax_cst_update_db', 'cst_db_update');
+add_action('wp_ajax_cst_update_db', 'cst_update_db');
 
-function cst_db_update() {
+function cst_update_db() {
 	if ( !current_user_can( 'manage_options' ) ) {
 		die();
 	}

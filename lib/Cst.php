@@ -68,22 +68,6 @@ class Cst {
 		add_action('wp_update_attachment_metadata', array($this, 'uploadMedia'));
 	}
 
-	public function getPath($strPath){
-		$strCachePath = realpath($strPath);
-		if( !$strCachePath ){
-			mkdir($strPath);
-			$strCachePath = realpath($strPath);
-		}
-		return $strCachePath;
-	}
-
-	public function checkTouch($strFlPth = false){
-		if( !file_exists($strFlPth) ) {
-			touch($strFlPth);
-		}
-		return $strFlPth;
-	}
-
 	public function wp_handle_upload( $data, $type ) {
 		$check_type = explode('/', $data['type']);
 	    if ( $check_type[0] != 'image' ) {
@@ -322,8 +306,7 @@ class Cst {
 		if (isset($_POST['cst-options']['syncfiles']['wp']))
 			$files[] = ABSPATH.'wp-includes';
 		if (isset($_POST['cst-options']['syncfiles']['media'])) {
-			$uploadDir = wp_upload_dir();
-			$files[] = $uploadDir['basedir'];
+			$files[] = $this->getUploadDirPath(); // add the base upload directory
 		}
 		if (isset($_POST['cst-options']['syncfiles']['plugin'])) {
 			$activePlugins = $this->getActivePlugins();
@@ -399,7 +382,7 @@ class Cst {
 	 */
 	private function generateRemotePath($file) {
 		// retrieve pointers to the upload directory path and the relative upload url
-		$uploadDir = wp_upload_dir();
+		$uploadDir = $this->getUploadDir();
 		$uploadDirPath = $this->getUploadDirPath();
 		$uploadFullUrl = $this->getUploadFullUrl();
 		$uploadRelUrl = ltrim(str_replace(get_bloginfo('url'),'',$uploadFullUrl),'/');
@@ -558,8 +541,7 @@ class Cst {
 							 ON pmt.post_id = pmo.post_id 
 							 AND pmt.meta_key = '_wp_attachment_metadata'   
 							 WHERE pmo.meta_key = '_wp_attached_file'",ARRAY_A );
-		$uploadDir = wp_upload_dir();
-		$uploadDir = $uploadDir['basedir'].'/';
+		$uploadDir = $this->getUploadDirPath().'/';
 		foreach($files as $file) {
 			$mediaFiles[] = $uploadDir.$file['filename'];
 		}
@@ -608,10 +590,9 @@ class Cst {
 		}
 		// else add the passed image file path, along with any additional image sizes
 		else {
-			$uploaddir = wp_upload_dir();
+			$uploaddir = $this->getUploadDir();
 			$uploadFullDir = $uploaddir['path'].'/';
-			$uploaddir = $uploaddir['basedir'].'/';
-			$filepath = $uploaddir.$post_id['file'];
+			$filepath = $this->getUploadDirPath().'/'.$post_id['file'];
 
 			$files[] = $filepath;
 
