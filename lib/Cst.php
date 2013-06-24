@@ -285,6 +285,28 @@ class Cst {
 	}
 
 	/**
+	 * Checks if the file is in an ignored path
+	 * 
+	 * @param $file string path of file relative to site root
+	 * @return boolean
+	 */
+	private function checkIfIgnoredPath($path) {
+		$ignorePaths = get_option('cst-ignore-paths');
+		foreach ($ignorePaths as &$ignorePath) {
+			if ($ignorePath) {
+				// for each ignore path
+				$ignorePath = ABSPATH . $ignorePath;
+				if (stristr($path, $ignorePath)) {
+					// if the ignore path can be found within the passed path, return true (is ignored path)
+					return true;
+				}
+			}
+		}
+		// otherwise return false (is not an ignored path)
+		return false;
+	}
+
+	/**
  	* Concatenates the passed files and saves to specified file
  	* 
  	* @param $files array of file paths to combine
@@ -567,21 +589,32 @@ class Cst {
 	private function getDirectoryFiles($dirs) {
 		$files = array();
 		foreach ($dirs as $dir) {
-			// if ($handle = opendir($dir)) {
-			// 	while (false !== ($entry = readdir($handle))) {
-			// 		if (preg_match('$\.(css|js|jpe?g|gif|png)$', $entry)) {
-			// 			$files[] = $dir.'/'.$entry;
-			// 		}
-			// 	}
-			// 	closedir($handle);
-			// }
 
-			$di = new RecursiveDirectoryIterator($dir);
+			if (!$this->checkIfIgnoredPath($dir)) { // first, confirm that this directory is not an ignored path
+				// if ($handle = opendir($dir)) {
+				// 	while (false !== ($entry = readdir($handle))) {
+				// 		if (preg_match('$\.(css|js|jpe?g|gif|png)$', $entry)) {
+				// 			$files[] = $dir.'/'.$entry;
+				// 		}
+				// 	}
+				// 	closedir($handle);
+				// }
 
-			foreach (new RecursiveIteratorIterator($di) as $filename => $file) {
-				if (preg_match('$\.(css|js|jpe?g|gif|png)$', $filename)) {
-					$files[] = $filename;
+				$di = new RecursiveDirectoryIterator($dir);
+
+				foreach (new RecursiveIteratorIterator($di) as $filename => $file) {
+					if (preg_match('$\.(css|js|jpe?g|gif|png)$', $filename)) {
+						if (!$this->checkIfIgnoredPath($filename)) {
+							// if this is a valid filename, and the filename is not an ignored
+							$files[] = $filename;
+						} else {
+							// echo "Note: the file " . $filename . " will not be synced because it is in an ignored filepath. <br />";
+						}
+					}
 				}
+			}
+			else {
+				// echo "Note: " . $dir . "will not be synced because it is an ignored path. <br />";
 			}
 
 		}

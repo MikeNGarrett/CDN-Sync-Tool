@@ -43,6 +43,19 @@ class CST_Page_Options extends CST_Page {
 				$dir = trim($dir);
 			}
 			$GLOBALS['core']->syncCustomDirectory($dirs);
+		} else if (isset($_POST['form']) && $_POST['form'] == 'cst-ignore-paths') {
+			if (wp_verify_nonce($GLOBALS['nonce'], 'cst-nonce')) {
+				$ignorePaths = explode("\n", $_POST['cst-custom-options']['ignorepaths']);
+				foreach ($ignorePaths as &$ignorePath) {
+					$ignorePath = trim($ignorePath);
+				}
+				update_option('cst-ignore-paths', $ignorePaths);
+				self::loadOptions();
+				self::displayPage('options');
+			} else {
+				_e('Security error');
+				die;
+			}
 		} else {
 			self::loadOptions();
 			self::displayPage('options');
@@ -70,6 +83,7 @@ class CST_Page_Options extends CST_Page {
 		parent::$options['cst-webdav-password'] = get_option('cst-webdav-password');
 		parent::$options['cst-webdav-host'] = get_option('cst-webdav-host');
 		parent::$options['cst-webdav-basedir'] = get_option('cst-webdav-basedir');
+		parent::$options['cst-ignore-paths'] = get_option('cst-ignore-paths');
 	}
 
 	/**

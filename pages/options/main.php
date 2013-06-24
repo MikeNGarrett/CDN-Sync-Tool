@@ -7,6 +7,15 @@ if (get_option('cst-custom-directories')) {
 	}
 	$directoryText = trim($directoryText);
 }
+
+if (get_option('cst-ignore-paths')) {
+	$ignorePaths = get_option('cst-ignore-paths');
+	$ignorePathsText = '';
+	foreach ($ignorePaths as $ignorePath) {
+		$ignorePathsText .= $ignorePath."\n";
+	}
+	$ignorePathsText = trim($ignorePathsText);
+}
 ?>
 <div class="cst-main">
 	<form action="" method="post">
@@ -33,6 +42,20 @@ if (get_option('cst-custom-directories')) {
 				<p>One directory per line, relative to site root.</p>
 			</div>
 			<p class="submit"><input type="submit" name="submit" class="button-primary" value="Sync" /></p>
+		</div>
+	</form>
+	<form action="" method="post">
+		<input type="hidden" name="form" value="cst-ignore-paths" />
+		<?php wp_nonce_field('cst-nonce'); ?>
+		<div class="cst-sync-options">
+			<h2 style="padding-left:10px;">Additional Sync Options</h2>
+			<h3>Set paths to be ignored during sync</h3>
+			<div class="cst-sync-options-input">
+				<textarea name="cst-custom-options[ignorepaths]" id="cst-ignore-paths" cols="30" rows="5"><?=$ignorePathsText?></textarea>
+				<p>One directory per line, relative to site root.</p>
+				<p>Note: this filter is not applied to the auto-sync process that takes place during Media upload.</p>
+			</div>
+			<p class="submit"><input type="submit" name="submit" class="button-primary" value="Save" /></p>
 		</div>
 	</form>
 </div>
