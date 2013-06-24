@@ -110,7 +110,10 @@ The difference is that with Origin Pull the files are pulled from your web host 
 
 * Fixed upload support for files other than images, eg PDFs, videos, doc files, etc.
 * Corrected debugging for sync function. Now when files are missing in the file structure, but not the database you'll get an error and the sync will continue.
-* [in progress] Switch syncing to run with AJAX to give better feedback, not timeout. 
+* Switch syncing to run with AJAX to give better feedback, not timeout. 
+* Fixed automatic sync of new media files, including additional thumbnail sizes
+* Now successfully identifies active plugins and syncs associated files
+* Corrects previous issues with the uploads URL paths resolving incorrectly in multisite
 
 = 2.2.1 =
 
