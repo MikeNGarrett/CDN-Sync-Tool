@@ -133,13 +133,20 @@ function cst_update_db() {
 	global $wpdb;
 	
 	$time = (int) $_POST['time']; // time has been included as parameter, in the event that it is needed for future development (e.g. WHERE statement for SQL update)
+	
+	// get the file object from the AJAX request. The file_dir value will be used to update the database
+	$file = '';
+	if(isset( $_POST['file'] )) {
+		$file = filter_var_array($_POST['file'], FILTER_SANITIZE_STRING);
+	}
+
 	$resUpdate = $wpdb->update(
 					CST_TABLE_FILES,
 					array(
 						'synced' => '1'
 					),
 					array(
-						'synced' => '0'
+						'file_dir' => $file['file_dir']
 					)
 				);
 	print('database status:');
