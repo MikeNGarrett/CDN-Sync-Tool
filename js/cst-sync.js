@@ -1,15 +1,6 @@
 jQuery(document).ready(function($) {
 	var queueTotal, qCount, queue, time;
 
-	// function upDB is called to update the CDN Sync Tool database upon completion
-	function upDB(file,time) {
-		$.ajax({
-			type: "post",
-			url: syncAjax.ajax_url,
-			data: {action: 'cst_update_db', cst_check: syncAjax.cst_check, time: time, file: file}
-		});
-	}
-
 	// function completeSync is called to update the front end upon successful completion of CDN sync
 	function completeSync() {
 		$(".status").html('Syncing complete!');
@@ -35,7 +26,6 @@ jQuery(document).ready(function($) {
 			url: syncAjax.ajax_url,
 			data: syncFileData,
 			success: function(response) {
-				upDB(passedFile,time);
 				$(".status").html('Syncing in progress - do not close this window. Syncing '+(qCount - 1)+' of '+queueTotal);
 				$(".cst-progress").append(response);
 				qCount--;

@@ -114,6 +114,7 @@ The difference is that with Origin Pull the files are pulled from your web host 
 * Fixed automatic sync of new media files, including additional thumbnail sizes
 * Now successfully identifies active plugins and syncs associated files
 * Corrects previous issues with the uploads URL paths resolving incorrectly in multisite
+* Updates the DB upon each file sync, rather than waiting for the entire queue to complete
 
 = 2.2.1 =
 

@@ -535,7 +535,32 @@ class Cst {
 		$this->pushFile($file['file_dir'], $file['remote_path']);
 		$padstr = str_pad("", 512, " ");
 		echo $padstr;
-		echo 'Syncing complete: '.$file['remote_path'].'<br /><hr />';
+		echo 'Syncing complete. ';
+	}
+
+	public function updateDatabaseAfterSync($file) {
+		global $wpdb;
+
+		$this->createConnection();
+		
+		// The file_dir value will be used to update the database
+		if($file) {
+			$file = filter_var_array($file, FILTER_SANITIZE_STRING);
+		}
+
+		$resUpdate = $wpdb->update(
+						CST_TABLE_FILES,
+						array(
+							'synced' => '1'
+						),
+						array(
+							'file_dir' => $file['file_dir']
+						)
+					);
+		echo 'DB records updated: ';
+		print_r($resUpdate);
+		echo '<br /><hr />';
+		die();
 	}
 
 	/**

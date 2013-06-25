@@ -118,42 +118,9 @@ function cst_sync_file() {
 	}
 
 	echo $GLOBALS['core']->syncIndividualFile($file);
+	echo $GLOBALS['core']->updateDatabaseAfterSync($file);
 	die();
 }
-
-add_action('wp_ajax_cst_update_db', 'cst_update_db');
-
-function cst_update_db() {
-	if ( !current_user_can( 'manage_options' ) ) {
-		die();
-	}
-	check_ajax_referer( 'cst_check_string', 'cst_check' );
-	ob_clean(); // clear buffer
-	
-	global $wpdb;
-	
-	$time = (int) $_POST['time']; // time has been included as parameter, in the event that it is needed for future development (e.g. WHERE statement for SQL update)
-	
-	// get the file object from the AJAX request. The file_dir value will be used to update the database
-	$file = '';
-	if(isset( $_POST['file'] )) {
-		$file = filter_var_array($_POST['file'], FILTER_SANITIZE_STRING);
-	}
-
-	$resUpdate = $wpdb->update(
-					CST_TABLE_FILES,
-					array(
-						'synced' => '1'
-					),
-					array(
-						'file_dir' => $file['file_dir']
-					)
-				);
-	print('database status:');
-	print_r($resUpdate);
-	die();
-}
-
 
 register_activation_hook(__FILE__, "cst_install");
 register_deactivation_hook(__FILE__, 'cst_deactivate');
