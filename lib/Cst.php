@@ -565,7 +565,6 @@ class Cst {
 					);
 		echo 'DB records updated: ';
 		print_r($resUpdate);
-		echo '<br /><hr />';
 	}
 
 	/**

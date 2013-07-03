@@ -121,6 +121,7 @@ function cst_sync_file() {
 	if ($success) {
 		$GLOBALS['core']->updateDatabaseAfterSync($file);
 	}
+	echo '<br /><hr />';
 	die();
 }
 
