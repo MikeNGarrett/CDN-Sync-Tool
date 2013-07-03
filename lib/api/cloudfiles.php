@@ -2394,7 +2394,39 @@ class CF_Object
     {
         $fp = @fopen($filename, "r");
         if (!$fp) {
-            throw new IOException("Could not open file for reading: ".$filename);
+			
+			// Attempting to get more debug info from files that aren't able to be open.
+			// Added by Mike. 
+			$filename = realpath($filename);
+			if(!$filename) {
+		        throw new IOException("File doesn't exist: ".$filename);
+			} else {
+				$test = fopen($filename, 'r');
+				if(!$test) { 
+					$check = file_exists($filename);
+					if($check) {
+						$check = is_readable($filename);
+						if($check) {
+							$check = filesize($filename);
+							if($check > 0) {
+								throw new IOException("Unknown error: ".pathinfo($filename));
+							} else {
+								throw new IOException("File is empty: ".$filename);
+							}
+						} else {
+							throw new IOException("File is not readable: ".$filename);
+						}
+						
+					} else {
+						throw new IOException("File does not exist: ".$filename);
+					}
+				} else {
+					$fp = $test;
+				}
+			}
+
+
+//            throw new IOException("Could not open file for reading: ".$filename);
         }
 
         clearstatcache();
