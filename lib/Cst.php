@@ -211,9 +211,8 @@ class Cst {
 				$result = $object->load_from_filename($file);
 			} catch (Exception $e) {
 				echo 'Load from Filename error: ' . $e->getMessage();
-				return false;
+				throw $e; // throw error to ensure DB is not updated
 			}
-
 			if (!$object) echo 'Debug: no object, but still made it to end of pushFile method.';
 		} else if ($this->connectionType == 'WebDAV') {
 			// Ensure directory exists, create it otherwise
@@ -533,16 +532,16 @@ class Cst {
 		$this->createConnection();
 
 		echo 'Beginning pushFile call: '.$file['remote_path'].'<br />';
-		$result = $this->pushFile($file['file_dir'], $file['remote_path']);
-		$padstr = str_pad("", 512, " ");
-		echo $padstr;
-		if ($result) {
-			echo 'Syncing complete. ';
-			return true;
-		} else {
+		try {
+			$padstr = str_pad("", 512, " ");
+			echo $padstr;
+			$this->pushFile($file['file_dir'], $file['remote_path']);
+		} catch (Exception $e) {
 			echo 'File could not be uploaded: DB not updated. ';
 			return false;
 		}
+		echo 'Syncing complete. ';
+		return true;
 	}
 
 	public function updateDatabaseAfterSync($file) {
