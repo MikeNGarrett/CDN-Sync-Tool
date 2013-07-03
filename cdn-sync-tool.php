@@ -117,8 +117,10 @@ function cst_sync_file() {
 		$file = filter_var_array($_POST['file'], FILTER_SANITIZE_STRING);
 	}
 
-	echo $GLOBALS['core']->syncIndividualFile($file);
-	echo $GLOBALS['core']->updateDatabaseAfterSync($file);
+	$success = $GLOBALS['core']->syncIndividualFile($file);
+	if ($success) {
+		$GLOBALS['core']->updateDatabaseAfterSync($file);
+	}
 	die();
 }
 
