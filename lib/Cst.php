@@ -211,6 +211,7 @@ class Cst {
 				$result = $object->load_from_filename($file);
 			} catch (Exception $e) {
 				echo 'Load from Filename error: ' . $e->getMessage();
+				return false;
 			}
 
 			if (!$object) echo 'Debug: no object, but still made it to end of pushFile method.';
@@ -532,10 +533,16 @@ class Cst {
 		$this->createConnection();
 
 		echo 'Beginning pushFile call: '.$file['remote_path'].'<br />';
-		$this->pushFile($file['file_dir'], $file['remote_path']);
+		$result = $this->pushFile($file['file_dir'], $file['remote_path']);
 		$padstr = str_pad("", 512, " ");
 		echo $padstr;
-		echo 'Syncing complete. ';
+		if ($result) {
+			echo 'Syncing complete. ';
+			return true;
+		} else {
+			echo 'File could not be uploaded: DB not updated. ';
+			return false;
+		}
 	}
 
 	public function updateDatabaseAfterSync($file) {
