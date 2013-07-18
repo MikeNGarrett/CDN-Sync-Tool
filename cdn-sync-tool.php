@@ -17,6 +17,33 @@ define('CST_FILE', __FILE__);
 define('CST_TABLE_FILES', $wpdb->get_blog_prefix().'cst_new_files');
 define('CST_CONTACT_EMAIL', 'support@catn.com');
 
+if( !function_exists('wdgFileCheck')  ){
+  function wdgFileCheck($strFlPth = false){
+    if( !file_exists($strFlPth) ) {
+      touch($strFlPth);
+    } elseif(!is_writable($strFlPth) ) {
+      unlink($strFlPth);
+      touch($strFlPth);
+    }
+
+    return $strFlPth;
+  }
+}
+
+if( !function_exists('wdgPathCheck') ){
+  function wdgPathCheck($strPath){
+    $strCachePath = realpath($strPath);
+
+    if( !$strCachePath ){
+      mkdir($strPath);
+
+      $strCachePath = realpath($strPath);
+    }
+
+    return $strCachePath;
+  }
+}
+
 
 if (is_admin()) {
 	require_once CST_DIR.'lib/Cst.php';
@@ -103,7 +130,7 @@ function cst_get_queue() {
 	die();
 }
 
-add_action('wp_ajax_cst_sync_file', 'cst_sync_file');
+// add_action('wp_ajax_cst_sync_file', 'cst_sync_file');
 
 function cst_sync_file() {
 	if ( !current_user_can( 'manage_options' ) ) {
@@ -121,6 +148,52 @@ function cst_sync_file() {
 	if ($success) {
 		$GLOBALS['core']->updateDatabaseAfterSync($file);
 	}
+	echo '<br /><hr />';
+	die();
+}
+
+add_action('wp_ajax_cst_sync_file', 'cst_sync_many_files');
+function cst_sync_many_files() {
+	if ( !current_user_can( 'manage_options' ) ) {
+		die();
+	}
+	check_ajax_referer( 'cst_check_string', 'cst_check' );
+	ob_clean(); // clear buffer
+
+	// ABSPATH
+
+	$file = '';
+
+	if(isset( $_POST['file'] )) {
+		$file = filter_var_array($_POST['file'], FILTER_SANITIZE_STRING);
+	}
+
+	$success = $GLOBALS['core']->syncManyFiles();
+
+	// if ($success) {
+	// 	$GLOBALS['core']->updateDatabaseAfterSync($file);
+	// }
+
+	echo 'Done...<br /><hr />';
+	die();
+}
+add_action('wp_ajax_cst_sync_progress', 'cst_sync_progress');
+function cst_sync_progress() {
+	$strCachePath = wdgPathCheck(ABSPATH .'/wp-content/cache');
+	$strCachePath = wdgPathCheck(ABSPATH .'/wp-content/cache/cdn');
+	$strFilesToSyncPath = wdgFileCheck($strCachePath .'/filetosync.cdn_sync');
+	$strProgressPath = wdgFileCheck($strCachePath .'/progress.cdn_sync');
+
+	$strProgress = file_get_contents($strProgressPath);
+	file_put_contents($strProgressPath, '');
+
+  $arrResults = unserialize( file_get_contents($strFilesToSyncPath) );
+
+	echo(json_encode(array(
+		'remaining' => sizeof($arrResults),
+		'progress_message' =>	$strProgress
+	)));
+
 	die();
 }
 

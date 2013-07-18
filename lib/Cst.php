@@ -9,6 +9,13 @@
  * @copyright All rights reserved 2011
  * @license GNU GPLv2
  */
+
+function getmicrotime() {
+  list($usec, $sec)=explode(" ", microtime());
+
+  return ((float)$usec + (float)$sec);
+}
+
 class Cst {
 	protected $cdnConnection, $connectionType, $fileTypes, $ftpHome;
 
@@ -443,38 +450,92 @@ class Cst {
 	private function _addFilesToDb($files, $forceSynced = null) {
 		global $wpdb;
 
-		// add in check to make sure files exist. 
-
-		// first, determine the relative path for uploads so we can identify them
-
+		$arrRemoteFiles = array();
+		$arrFileMods = array();
 		foreach($files as $file) {
-			// first, determine the relative path for uploads so we can identify them
-
-			$remotePath = $this->generateRemotePath($file);
-
-			$row = $wpdb->get_row("SELECT * FROM `".CST_TABLE_FILES."` WHERE `remote_path` = '".$remotePath."'");
+			// $file = realpath($file);
 
 
-			$changedate = filemtime($file);
+			if( file_exists($file) ){
+				// determine the relative path for uploads so we can identify them
+				$arrRemoteFiles[] = $this->generateRemotePath($file);
 
-			if ((!empty($row) && $changedate != $row->changedate) || (isset($_POST['cst-options']['syncall']) && $row != NULL)) {
-				$wpdb->update(
-					CST_TABLE_FILES,
-					array('changedate' => $changedate, 'synced' => (!$forceSynced ? '0' : '1')),
-					array('remote_path' => $remotePath)
-				);
-			} else if (!isset($row) || empty($row)) {
-				$wpdb->insert(
-					CST_TABLE_FILES,
-					array(
-	        			'file_dir' => $file,
-	      			    'remote_path' => $remotePath,
-	    			    'changedate' => filemtime($file),
-	   	 			    'synced' => (!$forceSynced ? '0' : '1')
-					)
-				);
+				$arrFileMods[$file] = filemtime($file);
 			}
 		}
+		$arrResults = $wpdb->get_results("SELECT * FROM `".CST_TABLE_FILES."` WHERE `remote_path` in('". implode("','", $arrRemoteFiles) ."')");
+
+		// add in check to make sure files exist.
+
+		$strCompare = '';
+
+		// --- 
+		$arrListToUpdate = array();
+		foreach($arrResults as $row) {
+			$remotePath = $row->remote_path;
+			$file = str_replace('//wp-content', '/wp-content', $row->file_dir);
+			$changedate = $arrFileMods[$file];
+
+			$strCompare .= $file ."\n";
+
+			// remove file from a total list of files because we know that is was returned by the select query results $arrResults
+			unset( $arrFileMods[$file] );
+
+			// Check to see if we want to add thie file to the list of file to be updated
+				if(($changedate >= $row->changedate) || (isset($_POST['cst-options']['syncall']) && $row != NULL)) {
+					$arrListToUpdate[] = $row->id;
+				}
+		}
+
+		$strDebugPath = ABSPATH .'/wp-content/cache/debug_cst2.txt';
+		touch($strDebugPath);
+
+		// if the array results stored in $arrListToUpdate is NOT empty then build an update query with file list.
+		$strPrepUpdate = '';
+		if( !empty($arrListToUpdate) ) {
+				$strPrepUpdate = $wpdb->prepare("
+					UPDATE `".CST_TABLE_FILES."` 
+					SET 
+					  changedate='". time() ."', 
+					  synced ='". (!$forceSynced ? '0' : '1') ."' 
+					WHERE 
+						id in('". implode("','", $arrListToUpdate) ."')",
+				  null
+			  );
+
+			$wpdb->query($strPrepUpdate);
+		}
+
+		$strInsertQuery = '';
+		if( !empty($arrFileMods) ) {
+			$strInsertQuery = "INSERT INTO ". CST_TABLE_FILES ." (file_dir, remote_path, changedate, synced) VALUES ";
+
+			foreach($arrFileMods as $file => $dtmFileMod) {
+				$remotePath = $this->generateRemotePath($file);
+				// $file = &$row->file_dir;
+				$changedate = $dtmFileMod;
+
+				$strInsertQuery .= "('". $file ."', '". $remotePath  ."', '". time()  ."', '". (!$forceSynced ? '0' : '1') ."'), ";
+			}
+
+			$strInsertQuery = trim($strInsertQuery, ', ');
+
+			$wpdb->query( $wpdb->prepare($strInsertQuery) );
+		}
+
+		// file_put_contents($strDebugPath, print_r(
+		// 	array(
+		// 		'_POST' => $_POST,
+		// 		'strCompare' => $strCompare, 
+		// 		'arrResults' => $arrResults, 
+		// 		'arrListToUpdate' => $arrListToUpdate,
+		// 		'arrFileMods' => $arrFileMods, 
+		// 		'strPrepUpdate' => $strPrepUpdate, 
+		// 		'strInsertQuery' => $strInsertQuery
+		// 	), 
+		// 	true
+		// ));
+
 	}
 
 	/**
@@ -485,8 +546,19 @@ class Cst {
 		global $wpdb;
 
 		$this->createConnection();
-			
+
 		$filesToSync = $wpdb->get_results("SELECT * FROM `".CST_TABLE_FILES."` WHERE `synced` = '0'", ARRAY_A);
+
+		$strCachePath = wdgPathCheck(ABSPATH .'/wp-content/cache');
+		$strCachePath = wdgPathCheck(ABSPATH .'/wp-content/cache/cdn');
+		$strCacheFile = wdgFileCheck($strCachePath .'/filetosync.cdn_sync');
+		$strProgressPath = wdgFileCheck($strCachePath .'/progress.cdn_sync');
+		$strCountPath = wdgFileCheck($strCachePath .'/progress_count.cdn_sync');
+
+		file_put_contents($strCacheFile, serialize($filesToSync));
+		file_put_contents($strProgressPath, '');
+		file_put_contents($strCountPath, count($filesToSync));
+
 		return $filesToSync;
 	}
 
@@ -544,6 +616,66 @@ class Cst {
 		return true;
 	}
 
+	public function syncManyFiles() {
+		global $wpdb;
+
+		$arrDebug = array();
+		$strDebugPath = ABSPATH .'/wp-content/cache/debug_cst2.txt';
+		touch($strDebugPath);
+
+		$strCachePath = wdgPathCheck(ABSPATH .'/wp-content/cache');
+		$strCachePath = wdgPathCheck(ABSPATH .'/wp-content/cache/cdn');
+		$strFilesToSyncPath = wdgFileCheck($strCachePath .'/filetosync.cdn_sync');
+		$strProgressPath = wdgFileCheck($strCachePath .'/progress.cdn_sync');
+		$strCountPath = wdgFileCheck($strCachePath .'/progress_count.cdn_sync');
+
+		$arrResults = unserialize( file_get_contents($strFilesToSyncPath) );
+
+		if(!empty($arrResults) ) {
+			$this->createConnection();
+	  	$t1 = getmicrotime();
+
+			$arrDebug['createConnection'] = getmicrotime() - $t1;
+
+ 			file_put_contents($strCountPath, count($arrResults));
+
+			for($x = 0; ($x < 8) && !empty($arrResults); $x++){
+				$file = array_shift($arrResults);
+
+
+				// file_put_contents($strProgressPath, 'Beginning pushFile call: '.$file['remote_path'].'<br />', FILE_APPEND);
+
+				$t1 = getmicrotime();
+				if( file_exists($file['file_dir']) ){
+					try {
+						$this->pushFile($file['file_dir'], $file['remote_path']);
+					} catch (Exception $e) {
+						echo 'File could not be uploaded: DB not updated. ';
+						return false;
+					}
+				}
+				$arrDebug['pushFile'] = getmicrotime() - $t1;
+
+				// file_put_contents($strProgressPath, 'Syncing complete. ', FILE_APPEND);
+
+				$resUpdate = $wpdb->update(
+						CST_TABLE_FILES,
+						array('synced' => '1'),
+						array('id' => $file['id'])
+					);
+
+				// file_put_contents($strProgressPath, 'DB records updated! <br /><hr />', FILE_APPEND);
+
+	 			file_put_contents($strCountPath, count($arrResults));
+				file_put_contents($strFilesToSyncPath, serialize($arrResults));
+
+				file_put_contents($strDebugPath, print_r($arrDebug, true));
+			}
+		}
+
+		return true;
+	}
+
 	public function updateDatabaseAfterSync($file) {
 		global $wpdb;
 
@@ -564,8 +696,7 @@ class Cst {
 						)
 					);
 		echo 'DB records updated: ';
-		print_r($resUpdate);
-		echo '<br /><hr />';
+		// print_r($resUpdate);
 	}
 
 	/**
