@@ -696,7 +696,7 @@ class Cst {
 						)
 					);
 		echo 'DB records updated: ';
-		// print_r($resUpdate);
+		print_r($resUpdate);
 	}
 
 	/**
