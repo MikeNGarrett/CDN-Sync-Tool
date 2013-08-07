@@ -475,7 +475,10 @@ class Cst {
 		foreach($arrResults as $row) {
 			$remotePath = $row->remote_path;
 			$file = str_replace('//wp-content', '/wp-content', $row->file_dir);
-			$changedate = $arrFileMods[$file];
+			$changedate = 0;
+			if(isset($arrFileMods[$file])) {
+				$changedate = $arrFileMods[$file];
+			}
 
 			$strCompare .= $file ."\n";
 
