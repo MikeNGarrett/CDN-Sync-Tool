@@ -298,7 +298,6 @@ class Cst {
 	 * @return boolean
 	 */
 	private function checkIfIgnoredPath($path) {
-		$ignorePaths = array();
 		$ignorePaths = get_option('cst-ignore-paths');
 		foreach ($ignorePaths as &$ignorePath) {
 			if ($ignorePath) {
@@ -450,6 +449,7 @@ class Cst {
 	 */
 	private function _addFilesToDb($files, $forceSynced = null) {
 		global $wpdb;
+
 		$arrRemoteFiles = array();
 		$arrFileMods = array();
 		foreach($files as $file) {
@@ -463,7 +463,6 @@ class Cst {
 				$arrFileMods[$file] = filemtime($file);
 			}
 		}
-
 		$arrResults = $wpdb->get_results("SELECT * FROM `".CST_TABLE_FILES."` WHERE `remote_path` in('". implode("','", $arrRemoteFiles) ."')");
 
 		// add in check to make sure files exist.
@@ -497,7 +496,6 @@ class Cst {
 		// if the array results stored in $arrListToUpdate is NOT empty then build an update query with file list.
 		$strPrepUpdate = '';
 		if( !empty($arrListToUpdate) ) {
-
 				$strPrepUpdate = $wpdb->prepare("
 					UPDATE `".CST_TABLE_FILES."` 
 					SET 
@@ -513,28 +511,19 @@ class Cst {
 
 		$strInsertQuery = '';
 		if( !empty($arrFileMods) ) {
-
 			$strInsertQuery = "INSERT INTO ". CST_TABLE_FILES ." (file_dir, remote_path, changedate, synced) VALUES ";
-			$x = 0;
-			foreach($arrFileMods as $file => $dtmFileMod) {	
 
+			foreach($arrFileMods as $file => $dtmFileMod) {
 				$remotePath = $this->generateRemotePath($file);
 				// $file = &$row->file_dir;
 				$changedate = $dtmFileMod;
 
 				$strInsertQuery .= "('". $file ."', '". $remotePath  ."', '". time()  ."', '". (!$forceSynced ? '0' : '1') ."'), ";
-
-				if($x > 100) {
-					$x = 0;
-
-					$strInsertQuery = trim($strInsertQuery, ', ');
-
-					$wpdb->query( $wpdb->prepare($strInsertQuery) );
-					$strInsertQuery = "INSERT INTO ". CST_TABLE_FILES ." (file_dir, remote_path, changedate, synced) VALUES ";
-				}
-
-				$x++;
 			}
+
+			$strInsertQuery = trim($strInsertQuery, ', ');
+
+			$wpdb->query( $wpdb->prepare($strInsertQuery) );
 		}
 
 		// file_put_contents($strDebugPath, print_r(
@@ -710,7 +699,7 @@ class Cst {
 						)
 					);
 		echo 'DB records updated: ';
-		print_r($resUpdate);
+		// print_r($resUpdate);
 	}
 
 	/**
@@ -796,7 +785,7 @@ class Cst {
 		return $files;
 	}
 
-	public function uploadMedia($post_id, $data) {
+	public function uploadMedia($post_id, $data = '') {
 		self::createConnection();
 
 		$files = array(); // initialize array of files. we will add any uploaded pathnames that need to be synced
