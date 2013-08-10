@@ -71,6 +71,7 @@ class CST_Page_Options extends CST_Page {
 		parent::$options['cst-s3-accesskey'] = get_option('cst-s3-accesskey');
 		parent::$options['cst-s3-secretkey'] = get_option('cst-s3-secretkey');
 		parent::$options['cst-s3-bucket'] = get_option('cst-s3-bucket');
+		parent::$options['cst-s3-endpoint'] = get_option('cst-s3-endpoint');
 		parent::$options['cst-ftp-server'] = get_option('cst-ftp-server');
 		parent::$options['cst-ftp-port'] = get_option('cst-ftp-port');
 		parent::$options['cst-ftp-username'] = get_option('cst-ftp-username');
