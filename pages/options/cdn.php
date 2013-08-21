@@ -38,6 +38,11 @@
 						<td><input type="text" name="options[cst-s3-bucket]" id="s3-bucket" <?php if (isset(self::$options['cst-s3-bucket'])) {echo 'value="'.esc_attr(self::$options['cst-s3-bucket']).'"'; } ?> /></td>
 						<td><strong>If the bucket does not exist it will be created</strong></td>
 					</tr>
+					<tr valign="top">
+						<th scope="row"><label for="s3-endpoint">Endpoint</label></th>
+						<td><input type="text" name="options[cst-s3-endpoint]" id="s3-endpoint" <?php if (isset(self::$options['cst-s3-endpoint'])) {echo 'value="'.esc_attr(self::$options['cst-s3-endpoint']).'"'; } ?> /></td>
+						<td><strong>For Amazon S3 use: s3.amazonaws.com</strong></td>
+					</tr>
 				</tbody>
 			</table>
 

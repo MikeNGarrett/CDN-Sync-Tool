@@ -103,7 +103,10 @@ class Cst {
 			require_once CST_DIR.'lib/api/S3.php';
 			$awsAccessKey = get_option('cst-s3-accesskey');
 			$awsSecretKey = get_option('cst-s3-secretkey');
-			$this->cdnConnection = new S3($awsAccessKey, $awsSecretKey);
+			$awsEndpoint = get_option('cst-s3-endpoint');
+			if( empty($awsEndpoint) ) $awsEndpoint = 's3.amazonaws.com'; // default endpoint to AWS S3
+			
+			$this->cdnConnection = new S3($awsAccessKey, $awsSecretKey, false, $awsEndpoint);
 			if (@$this->cdnConnection->listBuckets() === false) {
 				CST_page::$messages[] = 'S3 connection error, please check details';
 			}
