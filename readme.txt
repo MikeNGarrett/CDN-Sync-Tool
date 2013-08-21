@@ -2,8 +2,8 @@
 = Maintained by WDG =
 Contributors: olliea95,Fubra,Backie,ray.viljoen,MikeNGarrett,nelsonmc
 Tags: CDN,content delivery network, sync, CDN sync, tool, Content, Upload, Files, Media, Optimization,cloudfront,cloud front,amazon s3,s3,cloudfiles,theme,MaxCDN,Origin Pull,Origin,Pull,files,speed,faster,accelerator,Page Load, zoom, webdav, web, dav
-Tested up to: 3.5
-Stable tag: 2.3
+Tested up to: 3.5 Single & Multisite
+Stable tag: 2.4
 Requires At Least: 3.0
 Donate Link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=99WUGVV4HY5ZE&lc=GB&item_name=CATN%20Plugins-CDN&item_number=catn-cdn&currency_code=GBP&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted 
 
