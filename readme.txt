@@ -1,10 +1,16 @@
 === CDN Sync Tool ===
+= Maintained by WDG =
 Contributors: olliea95,Fubra,Backie,ray.viljoen,MikeNGarrett,nelsonmc
 Tags: CDN,content delivery network, sync, CDN sync, tool, Content, Upload, Files, Media, Optimization,cloudfront,cloud front,amazon s3,s3,cloudfiles,theme,MaxCDN,Origin Pull,Origin,Pull,files,speed,faster,accelerator,Page Load, zoom, webdav, web, dav
-Tested up to: 3.4
+Tested up to: 3.5
 Stable tag: 2.3
 Requires At Least: 3.0
 Donate Link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=99WUGVV4HY5ZE&lc=GB&item_name=CATN%20Plugins-CDN&item_number=catn-cdn&currency_code=GBP&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHosted 
+
+== IMPORTANT ==
+This fork of CDN Sync Tool is significantly split from the original. It's been tested primarily with Rackspace. 
+
+
 
 Syncs static files to a content delivery network (CDN) such as Amazon S3 / CloudFront,MaxCDN, WebDAV, FTP and CloudFiles. To be used with WP-Supercache.
  
@@ -105,6 +111,14 @@ The difference is that with Origin Pull the files are pulled from your web host 
 3. Go CDN Sync Tool and configure
 
 == CHANGELOG ==
+
+= 2.4.1 =
+* Supporting custom endpoints thanks to ryanboswell
+
+= 2.4 =
+* There are a good amount of changes to the way CDN Sync Tool builds a file list, sync new files and updates the database. 
+* Tt's the first stable version in quite some time. 
+* Added the ability to exclude directories and files (use carefully! These excluded paths aren't synced with SuperCache)
 
 = 2.3 = 
 
