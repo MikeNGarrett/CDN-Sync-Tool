@@ -11,7 +11,7 @@ Version: 2.2.1
 global $wpdb;
 
 define('CST_DIR', dirname(__FILE__).'/');
-define('CST_VERSION', '2.2.1');
+define('CST_VERSION', '2.4.1');
 define('CST_URL', admin_url('options-general.php'));
 define('CST_FILE', __FILE__);
 define('CST_TABLE_FILES', $wpdb->get_blog_prefix().'cst_new_files');
