@@ -302,6 +302,7 @@ class Cst {
 	 */
 	private function checkIfIgnoredPath($path) {
 		$ignorePaths = get_option('cst-ignore-paths');
+		if(!$ignorePaths) { return false; }
 		foreach ($ignorePaths as &$ignorePath) {
 			if ($ignorePath) {
 				// for each ignore path
