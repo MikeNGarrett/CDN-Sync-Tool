@@ -47,6 +47,7 @@ if( !function_exists('wdgPathCheck') ){
 
 if (is_admin()) {
 	require_once CST_DIR.'lib/Cst.php';
+	global $core;
 	$core = new Cst();
 } else {
 	require_once CST_DIR.'lib/Site.php';
@@ -110,7 +111,8 @@ function cst_deactivate() {
 }
 
 function hourlySync() {
-	$GLOBALS['core']->syncFiles();
+	global $core;
+	$core->syncFiles();
 }
 
 function superCacheError() {
