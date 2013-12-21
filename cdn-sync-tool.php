@@ -111,7 +111,9 @@ function cst_deactivate() {
 }
 
 function hourlySync() {
+	require_once CST_DIR.'lib/Cst.php';
 	global $core;
+	$core = new Cst();
 	$core->syncFiles();
 }
 
