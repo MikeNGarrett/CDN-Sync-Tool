@@ -110,7 +110,9 @@ function cst_deactivate() {
 }
 
 function hourlySync() {
-	$GLOBALS['core']->syncFiles();
+	require_once CST_DIR.'lib/Cst.php';
+	$core = new Cst();
+	$core->syncFiles();
 }
 
 function superCacheError() {
