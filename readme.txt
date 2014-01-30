@@ -340,3 +340,5 @@ The difference is that with Origin Pull the files are pulled from your web host 
 
 1. Options Page
 2. Files syncing
+
+[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/WDGDC/cdn-sync-tool/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
