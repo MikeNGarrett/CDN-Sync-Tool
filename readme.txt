@@ -1,3 +1,5 @@
+FORK NO LONGER MAINTAINED!
+
 === CDN Sync Tool ===
 = Maintained by WDG =
 Contributors: olliea95,Fubra,Backie,ray.viljoen,MikeNGarrett,nelsonmc
